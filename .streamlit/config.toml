@@ -1,0 +1,8 @@
+# DataHealth AI — local visual theme. No server or security settings are changed.
+[theme]
+base = "dark"
+primaryColor = "#4ADAC5"
+backgroundColor = "#081120"
+secondaryBackgroundColor = "#111E33"
+textColor = "#EBF4FF"
+font = "sans serif"

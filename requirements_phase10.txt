@@ -1,0 +1,4 @@
+# DataHealth AI — Phase 10 Analytics Dashboard
+# Streamlit is already installed in Phase 9; install these packages in the same .venv.
+pandas>=2.2,<4
+plotly>=5.24,<7

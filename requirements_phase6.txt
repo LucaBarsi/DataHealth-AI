@@ -1,0 +1,2 @@
+# Use Python 3.12 or 3.13 for this phase if your default Python is experimental.
+chromadb>=1.4,<2

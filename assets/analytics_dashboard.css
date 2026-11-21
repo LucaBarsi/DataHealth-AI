@@ -1,0 +1,9 @@
+/* DataHealth AI — supplemental analytics page. Reuses the Phase 9 visual identity. */
+.dh-dashboard-hero {padding-top: 1.5rem; padding-bottom: 1.5rem;}
+.dh-dashboard-hero h1 {font-size: clamp(1.8rem, 3.2vw, 2.7rem);}
+.dh-dashboard-sidebar-note {color: #98afc6; font-size: .78rem; line-height: 1.65;}
+[data-testid="stTabs"] [data-baseweb="tab-list"] {gap: .5rem;}
+[data-testid="stTabs"] [data-baseweb="tab"] {border-radius: 10px 10px 0 0; color:#b9d0e7;}
+[data-testid="stTabs"] [aria-selected="true"] {color:#4adac5;}
+[data-testid="stPlotlyChart"] {background: rgba(17,30,51,.42);border:1px solid rgba(164,198,228,.10);border-radius:14px; padding: .4rem;}
+[data-testid="stDataFrame"] {border: 1px solid rgba(164,198,228,.10); border-radius: 12px;}

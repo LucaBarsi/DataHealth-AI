@@ -1,0 +1,53 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+.ipynb_checkpoints/
+.DS_Store
+# Arquivos baixados / dados intermediarios
+/data/raw/*
+!/data/raw/.gitkeep
+/reports/*
+!/reports/.gitkeep
+# Phase 12 — DataHealth AI local artifacts (append to existing .gitignore)
+# Keep the source code and documents; do not upload generated patient datasets.
+/.venv/
+/venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+*.log
+
+# All local clinical data and run outputs stay out of the public repository.
+/data/
+/reports/
+*.db
+*.sqlite
+*.sqlite3
+*.gguf
+*.safetensors
+*.ckpt
+
+# Local machine credentials, tokens and application secrets.
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+*.pem
+*.p12
+*.pfx
+*.key
+credentials.json
+service-account.json
+
+# Local editors, notebooks and OS artifacts.
+.vscode/
+.idea/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db

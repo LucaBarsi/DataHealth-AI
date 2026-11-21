@@ -1,0 +1,8 @@
+# DataHealth AI — local prototype (Python 3.12 recommended).
+# Install alongside the repository's original phase-specific requirements.
+# These dependencies do not provide a hosted Qwen/Ollama service or cloud data.
+chromadb>=1.4,<2
+streamlit>=1.45,<2
+pandas>=2.2,<4
+plotly>=5.24,<7
+matplotlib>=3.8,<4

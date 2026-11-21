@@ -1,0 +1,74 @@
+/* DataHealth AI — branded dark research workspace
+   Visual changes only. No clinical rules or retrieval algorithms are modified. */
+:root {
+    --dh-bg: #081120;
+    --dh-panel: #111e33;
+    --dh-card: #14253a;
+    --dh-border: rgba(164, 198, 228, 0.17);
+    --dh-ink: #ebf4ff;
+    --dh-muted: #a2b7cd;
+    --dh-accent: #4adac5;
+    --dh-blue: #78a9ff;
+}
+[data-testid="stAppViewContainer"] {
+    background: radial-gradient(ellipse at 78% -4%, rgba(38, 110, 140, .12), transparent 42%), var(--dh-bg);
+}
+[data-testid="stSidebar"] {
+    background: #0d1a2c;
+    border-right: 1px solid var(--dh-border);
+}
+[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+    padding-top: 1.15rem;
+}
+[data-testid="stHeader"] {background: transparent;}
+.block-container {max-width: 1280px; padding-top: 1.7rem; padding-bottom: 3rem;}
+[data-testid="stAppViewContainer"] h1, [data-testid="stAppViewContainer"] h2, [data-testid="stAppViewContainer"] h3 {
+    letter-spacing: -0.025em;
+}
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] .stCaption {color: var(--dh-muted);}
+.dh-sidebar-logo {display:flex; align-items:center; gap:.75rem; padding:.65rem 0 1.1rem;}
+.dh-logo-mark {width:48px; height:48px; border-radius:14px; color:#062633; background:linear-gradient(135deg,#6ae5d6,#79baff); display:grid; place-items:center; font-weight:850; letter-spacing:-.08em; font-size:1.22rem; box-shadow:0 6px 25px rgba(68,218,193,.15);}
+.dh-logo-mark span {font-size:.95rem; letter-spacing:0;}
+.dh-sidebar-wordmark {font-size:1.17rem;font-weight:750;color:var(--dh-ink);line-height:1.1;}
+.dh-sidebar-wordmark span {color:var(--dh-accent);}
+.dh-sidebar-caption {font-size:.62rem;letter-spacing:.16em;color:var(--dh-muted);margin-top:.32rem;}
+.dh-sidebar-section {border-top:1px solid var(--dh-border); margin-top:1rem; padding-top:1.05rem; margin-bottom:.7rem; font-size:.69rem; letter-spacing:.15em; font-weight:800; color:var(--dh-accent);}
+.dh-sidebar-patient {background:rgba(104,157,217,.075);border:1px solid var(--dh-border);border-radius:13px;padding:.85rem .9rem;margin:.65rem 0 .4rem;}
+.dh-sidebar-patient-name {font-size:.96rem;font-weight:750;color:var(--dh-ink);overflow-wrap:anywhere;}
+.dh-sidebar-patient-meta {font-size:.59rem;letter-spacing:.11em;color:var(--dh-accent);margin:.35rem 0 .75rem;}
+.dh-sidebar-patient-detail {font-size:.82rem;color:var(--dh-muted);line-height:1.7;}
+.dh-sidebar-footer {font-size:.68rem;line-height:1.9;color:var(--dh-muted);border-top:1px solid var(--dh-border);margin-top:1.5rem;padding-top:1rem;}
+.dh-status-dot {display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dh-accent);margin-right:.35rem;box-shadow:0 0 10px rgba(74,218,197,.5);}
+.dh-hero {position:relative;overflow:hidden;background:linear-gradient(110deg,#142742 0%,#102139 55%,#103d4a 100%);border:1px solid rgba(105,182,206,.25);border-radius:22px;padding:2.25rem 2.45rem 2rem;margin-bottom:1.1rem;}
+.dh-hero:after {content:""; position:absolute; width:300px;height:300px;border:1px solid rgba(95,216,197,.14);border-radius:50%;right:-80px;top:-110px;box-shadow:0 0 0 48px rgba(74,218,197,.035),0 0 0 105px rgba(74,218,197,.025);pointer-events:none;}
+.dh-hero > * {position:relative;z-index:1;}
+.dh-kicker {font-size:.7rem;font-weight:850;letter-spacing:.21em;color:#82dfd8;margin-bottom:1rem;}
+.dh-kicker span {color:rgba(208,226,246,.5);padding:0 .45rem;}
+.dh-hero h1 {font-size:clamp(2rem,3.4vw,3.15rem);line-height:1.11;font-weight:820;margin:0 0 .8rem;letter-spacing:-.05em;color:#f0f9ff;}
+.dh-hero h1 em {color:#68dfd0;font-style:normal;}
+.dh-hero p {font-size:.94rem;line-height:1.65;color:#c0d5e4;max-width:590px;margin:0 0 1.25rem;}
+.dh-hero-tags {display:flex;flex-wrap:wrap;gap:.5rem;}
+.dh-hero-tags span {border:1px solid rgba(160,215,225,.3);border-radius:100px;padding:.3rem .74rem;color:#cceeea;font-size:.73rem;background:rgba(9,34,50,.36);}
+.dh-disclaimer {font-size:.76rem;line-height:1.6;color:#d8c9a0;background:rgba(179,128,43,.1);border:1px solid rgba(201,157,77,.2);border-radius:12px;padding:.8rem 1rem;margin-bottom:1.5rem;}
+.dh-disclaimer strong {color:#ffce76;letter-spacing:.055em;}
+.dh-eyebrow {color:var(--dh-accent);font-size:.7rem;font-weight:800;letter-spacing:.16em;margin:1.6rem 0 .2rem;}
+.dh-section-title {font-size:1.15rem;font-weight:750;margin:1.6rem 0 .35rem;color:var(--dh-ink);}
+[data-testid="stMetric"] {background:var(--dh-panel);border:1px solid var(--dh-border);border-radius:14px;padding:1rem 1.1rem;min-height:112px;}
+[data-testid="stMetricLabel"] {color:var(--dh-muted);}
+[data-testid="stMetricValue"] {font-size:1.55rem;letter-spacing:-.04em;}
+.stButton button {border-radius:11px;border:1px solid rgba(133,185,204,.26);background:#172a3f;color:#dfedf9;font-weight:590;transition:background .16s,border .16s;}
+.stButton button:hover {border-color:#63d0c4;color:#8ef5e3;background:#18364a;}
+[data-testid="stChatMessage"] {background:rgba(22,39,58,.78);border:1px solid rgba(123,171,202,.13);border-radius:15px;margin:.75rem 0;padding:.6rem .85rem;}
+[data-testid="stChatInput"] {border-radius:14px;}
+[data-testid="stExpander"] {border:1px solid var(--dh-border);border-radius:12px;}
+.dh-app-footer {border-top:1px solid var(--dh-border);margin-top:2.6rem;padding:1.1rem .2rem;color:#829cb2;font-size:.72rem;line-height:1.7;}
+.dh-app-footer span {color:var(--dh-accent);padding:0 .35rem;}
+@media(max-width:760px) {
+    .block-container {padding-top:1rem;}
+    .dh-hero {padding:1.4rem 1.3rem;}
+    .dh-hero:after {display:none;}
+    .dh-hero h1 {font-size:1.95rem;}
+    .dh-hero p {font-size:.86rem;}
+    .dh-sidebar-caption {letter-spacing:.1em;}
+}

@@ -1,0 +1,3 @@
+# Phase 9 only: reuse the existing Python 3.12 virtual environment.
+# Phase 6 requirements (including ChromaDB) must already be installed.
+streamlit>=1.45,<2
