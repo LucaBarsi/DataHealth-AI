@@ -28,6 +28,7 @@ from demo_backend import (  # noqa: E402
 from remote_inference import RemoteInferenceError, remote_qwen_answer  # noqa: E402
 from suggested_questions import SUGGESTED_QUESTIONS  # noqa: E402
 from usage_controls import SharedProcessBudget, UsagePolicy, reserve_hosted_call  # noqa: E402
+from scope_validation import negative_claim_check, retrieval_scope  # noqa: E402
 
 st.set_page_config(
     page_title="DataHealth AI | Public Demo",
@@ -69,13 +70,17 @@ def secret(name: str) -> str:
 def show_evidence(evidence: dict) -> None:
     with st.expander("Inspect retrieved sources and quality metadata", expanded=False):
         st.caption("These are patient-scoped fixtures; citation IDs identify the sample rows only.")
+        scope = retrieval_scope(evidence)["categories"]
         for label, key in (("Structured measurements", "observations"),
                            ("Recorded conditions", "conditions"), ("Medication requests", "medications"), ("Clinical notes", "notes")):
             st.markdown("**" + label + "**")
             if evidence.get(key):
                 st.dataframe(evidence[key], width="stretch", hide_index=True)
+            elif not scope[key]["queried"]:
+                st.caption("Not queried for this question; absence of rows here is not proof of absence.")
             else:
-                st.caption("No records retrieved in this category.")
+                st.caption("Queried, but no matching records were retrieved in this scope.")
+        st.caption("Only selected evidence was retrieved. Do not infer absence of other records.")
         st.caption("Note retrieval uses simple keyword matching, not ChromaDB/vector RAG.")
 
 
@@ -233,8 +238,13 @@ with chat_tab:
                         api_base=api_base, api_key=api_key, model_id=model_id)
                     check = citation_check(generated, evidence)
                     if check["valid"]:
-                        response = generated
-                        status = "CITATION_IDS_VALID"
+                        scope_check = negative_claim_check(generated, evidence)
+                        if scope_check["valid"]:
+                            response = generated
+                            status = "CITATION_IDS_VALID"
+                        else:
+                            status = "EVIDENCE_ONLY_FALLBACK"
+                            fallback_reason = "EVIDENCE_SCOPE_VIOLATION"
                     else:
                         status = "EVIDENCE_ONLY_FALLBACK"
                         fallback_reason = "CITATION_CHECK_FAILED"

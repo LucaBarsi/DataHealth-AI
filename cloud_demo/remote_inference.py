@@ -11,6 +11,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
+try:
+    from .scope_validation import retrieval_scope
+except ImportError:  # Streamlit launches this module from cloud_demo/ as a script directory
+    from scope_validation import retrieval_scope
+
 
 class RemoteInferenceError(RuntimeError):
     """Public-safe failure with an intentionally coarse error code."""
@@ -56,10 +61,17 @@ def remote_qwen_answer(*, evidence: dict, question: str, api_base: str, model_id
     url = chat_completion_url(api_base)
     context = {key: evidence[key] for key in ("patient", "observations", "medications", "notes", "limitations")}
     context["conditions"] = evidence.get("conditions", [])
+    context["retrieval_scope"] = retrieval_scope(evidence)
     system = (
         "You are DataHealth AI, an educational demonstration using invented synthetic fixtures only. "
         "Only report facts present in the JSON evidence; never infer diagnosis, treatment or patient status. "
         "Mention missing evidence plainly, not as proof of absence. "
+        "IMPORTANT: retrieval_scope.categories marks which data categories were QUERIED. "
+        "Never assert that a patient has no conditions, medications, measurements or notes "
+        "unless the evidence actually supports the statement within the queried scope. "
+        "Do not make broad claims such as 'no other conditions were recorded' or "
+        "'no medications exist'. If a category was NOT queried, omit claims about it, "
+        "or state precisely that it was not searched. Retrieved lists may be limited. "
         "Cite each relevant claim with the EXACT source_marker strings copied from the evidence. "
         "Your answer MUST include at least one exact source_marker when evidence is present. "
         "Do not invent or shorten citation markers. "

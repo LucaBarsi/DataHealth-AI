@@ -25,6 +25,7 @@ from .demo_backend import (
 )
 from .remote_inference import RemoteInferenceError, remote_qwen_answer
 from .suggested_questions import SUGGESTED_QUESTIONS
+from .scope_validation import negative_claim_check, retrieval_scope
 
 HERE = Path(__file__).resolve().parent
 MANUAL_COLUMNS = [
@@ -111,8 +112,13 @@ def run_evaluation(
                     )
                     checked = citation_check(generated, evidence)
                     if checked['valid']:
-                        answer = generated
-                        status = 'CITATION_IDS_VALID'
+                        scoped = negative_claim_check(generated, evidence)
+                        if scoped['valid']:
+                            answer = generated
+                            status = 'CITATION_IDS_VALID'
+                        else:
+                            status = 'EVIDENCE_ONLY_FALLBACK'
+                            error_code = 'EVIDENCE_SCOPE_VIOLATION'
                     else:
                         status = 'EVIDENCE_ONLY_FALLBACK'
                         error_code = 'CITATION_CHECK_FAILED'
@@ -127,6 +133,7 @@ def run_evaluation(
                 'status': status, 'patient_isolation_pass': isolation_ok,
                 'evidence_count': len(markers), 'exact_citations_pass': check['valid'] if markers else None,
                 'unknown_source_marker_count': len(check['unknown']),
+                'retrieval_scope': retrieval_scope(evidence),
                 'retrieval_counts': {
                     k: len(evidence[k]) for k in ('observations', 'conditions', 'medications', 'notes')
                 },
