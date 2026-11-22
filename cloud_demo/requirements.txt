@@ -1,4 +1,5 @@
-# Lightweight requirements for cloud_demo/streamlit_app.py ONLY.
-# Streamlit Community Cloud detects this file next to the entrypoint.
+# Public Streamlit app. ONNX embeddings are optional at runtime (owner opt-in).
+# FastEmbed adds dependency/download weight, but requires no separate embeddings API.
 streamlit>=1.51,<2.0
 plotly>=5.24,<7.0
+fastembed>=0.7,<1.0

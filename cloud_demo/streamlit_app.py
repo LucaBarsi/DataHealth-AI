@@ -11,6 +11,7 @@ from __future__ import annotations
 from html import escape
 from pathlib import Path
 import json
+import os
 import sqlite3
 import sys
 
@@ -23,12 +24,13 @@ sys.path.insert(0, str(HERE))
 
 from demo_backend import (  # noqa: E402
     allowed_markers, citation_check, counts, evidence_only_answer, list_patients,
-    load_fixtures, measurement_options, open_demo_database, retrieve_evidence, series_for_patient,
+    load_fixtures, measurement_options, open_demo_database, retrieve_evidence, route_question, series_for_patient,
 )
 from remote_inference import RemoteInferenceError, remote_qwen_answer  # noqa: E402
 from suggested_questions import SUGGESTED_QUESTIONS  # noqa: E402
 from usage_controls import SharedProcessBudget, UsagePolicy, reserve_hosted_call  # noqa: E402
 from scope_validation import negative_claim_check, retrieval_scope  # noqa: E402
+from semantic_retrieval import MODEL_NAME, load_retriever  # noqa: E402
 
 st.set_page_config(
     page_title="DataHealth AI | Public Demo",
@@ -48,6 +50,18 @@ st.markdown("""
 @st.cache_data(show_spinner=False)
 def fixtures() -> dict:
     return load_fixtures(HERE / "sample_records.json")
+
+
+@st.cache_resource(show_spinner=False)
+def semantic_engine():
+    """Load ONNX once per process, lazily on a document question (opt-in)."""
+    return load_retriever(fixtures(), index_path=HERE / "semantic_index.json")
+
+
+def semantic_enabled() -> bool:
+    """Only project owner may opt in; never load the model for visitors by default."""
+    value = secret("SEMANTIC_RAG_ENABLED") or os.getenv("SEMANTIC_RAG_ENABLED", "")
+    return str(value).lower() in ("true", "1", "yes", "on")
 
 # Shared across sessions in one Streamlit server process only. This best-effort
 # limit resets on deployment/restart and is NOT an account-level spending cap.
@@ -81,7 +95,13 @@ def show_evidence(evidence: dict) -> None:
             else:
                 st.caption("Queried, but no matching records were retrieved in this scope.")
         st.caption("Only selected evidence was retrieved. Do not infer absence of other records.")
-        st.caption("Note retrieval uses simple keyword matching, not ChromaDB/vector RAG.")
+        method = evidence.get("document_retrieval", {}).get("method", "legacy_keyword")
+        if method == "semantic_vector_cosine":
+            st.caption("Note retrieval: patient-scoped FastEmbed ONNX cosine search. Similarity is not factual support.")
+        elif method == "lexical_keywords":
+            st.caption("Note retrieval: keyword matching (semantic search off or unavailable).")
+        else:
+            st.caption("Clinical notes were not queried.")
 
 
 def chart_panel(conn: sqlite3.Connection, patient_id: str, *, key: str) -> None:
@@ -158,7 +178,9 @@ with st.sidebar:
     st.markdown('<div class="dh-sidebar-section">RETRIEVAL SETTINGS</div>', unsafe_allow_html=True)
     retrieval = st.selectbox("Data source", ["Auto", "Measurements", "Clinical notes", "Combined"])
     mode = {"Auto":"auto", "Measurements":"measurements", "Clinical notes":"notes", "Combined":"combined"}[retrieval]
-    st.caption("Read-only SQLite in memory · Keyword-based document matching")
+    st.caption("Read-only SQLite in memory · Optional semantic note retrieval")
+    st.caption("Document retrieval: ONNX semantic search (experimental)" if semantic_enabled() else
+               "Document retrieval: keyword search (stable default)")
     st.markdown('<div class="dh-sidebar-section">INFERENCE MODE</div>', unsafe_allow_html=True)
     st.markdown("**Hosted Qwen configured**" if remote_ready else "**Evidence-only preview**")
     st.caption("Hosted model available only when the project owner configures a provider and API key." if not remote_ready else
@@ -210,6 +232,7 @@ with chat_tab:
             st.markdown(item["text"])
             if item["role"] == "assistant" and item.get("evidence"):
                 st.caption("Retrieval status: " + item.get("status", "UNSPECIFIED") + " · Citation IDs do not prove factual support.")
+                st.caption("Notes: " + item["evidence"].get("document_retrieval", {}).get("method", "unknown"))
                 if item.get("fallback_reason"):
                     st.caption("Hosted-model diagnostic: " + item["fallback_reason"])
                 show_evidence(item["evidence"])
@@ -219,7 +242,16 @@ with chat_tab:
         # Suggestions use reliable auto routing regardless of the custom sidebar mode.
         # Custom typed questions continue to respect the sidebar selection.
         effective_mode = "auto" if choice and not typed else mode
-        evidence = retrieve_evidence(conn, selected_id, query, mode=effective_mode)
+        semantic_search = None
+        if semantic_enabled() and route_question(query, effective_mode)[1]:
+            try:
+                # Model download / index check happens only for document questions.
+                semantic_search = semantic_engine().search
+            except Exception:
+                # Keep the public demo operational if the small model is unavailable.
+                st.info("Semantic retrieval is unavailable; using keyword search for this request.")
+        evidence = retrieve_evidence(conn, selected_id, query, mode=effective_mode,
+                                     semantic_search=semantic_search)
         response = evidence_only_answer(evidence)
         status = "EVIDENCE_ONLY"
         fallback_reason = None
@@ -266,6 +298,7 @@ with chat_tab:
         with st.chat_message("assistant"):
             st.markdown(response)
             st.caption("Retrieval status: " + status + " · Exact citation IDs are not proof of factual support.")
+            st.caption("Notes: " + evidence.get("document_retrieval", {}).get("method", "unknown"))
             if fallback_reason:
                 st.caption("Hosted-model diagnostic: " + fallback_reason)
             show_evidence(evidence)

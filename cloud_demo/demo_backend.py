@@ -1,8 +1,9 @@
 """DataHealth AI: public, read-only demo backend.
 
 Uses fictional fixtures and an ephemeral in-memory SQLite database. No local
-Synthea, ChromaDB, or Ollama dependency. Document retrieval is lexical, NOT
-semantic vector RAG. This module does not support actual patient data.
+Synthea, ChromaDB, or Ollama dependency. Optional patient-scoped ONNX vector
+retrieval is injected by the app; lexical search remains the safe fallback.
+This module does not support actual patient data.
 """
 from __future__ import annotations
 
@@ -12,6 +13,7 @@ from pathlib import Path
 import json
 import re
 import sqlite3
+from collections.abc import Callable
 
 STOPWORDS = frozenset({"the", "and", "for", "with", "most", "recent", "latest", "show", "what", "does", "about", "into", "from", "this", "that", "patient", "please", "summarize", "summary", "their", "clinical", "records"})
 CITATION_PATTERN = re.compile(r"\[(SQL|DOC):([^\]\s]+)\]")
@@ -144,7 +146,8 @@ def measurement_codes_for_question(question: str) -> frozenset[str] | None:
     return None
 
 
-def retrieve_evidence(conn: sqlite3.Connection, patient_id: str, question: str, mode: str="auto", limit: int=6) -> dict:
+def retrieve_evidence(conn: sqlite3.Connection, patient_id: str, question: str, mode: str="auto", limit: int=6,
+                      semantic_search: Callable | None = None) -> dict:
     if not 1 <= limit <= 15:
         raise ValueError("Invalid evidence limit")
     patient = _rows(conn, "SELECT patient_id, full_name, gender, birth_date FROM patients WHERE patient_id=?", (patient_id,))
@@ -174,11 +177,39 @@ def retrieve_evidence(conn: sqlite3.Connection, patient_id: str, question: str, 
                            FROM medications WHERE patient_id=? ORDER BY authored_on DESC LIMIT ?""",
                   (patient_id, limit)) if want_medications else [])
     notes = []
+    retrieval_method = "not_queried"
     if want_notes:
         candidates = _rows(conn, "SELECT document_id, date, type, text FROM notes WHERE patient_id=? ORDER BY date DESC", (patient_id,))
-        qterms = _tokens(question)
-        scored = [(len(qterms & _tokens(n["text"])), n["date"], n) for n in candidates]
-        notes = [n for _, _, n in sorted(scored, key=lambda x: (x[0], x[1]), reverse=True)[:2]]
+        retrieval_method = "lexical_keywords"
+        if semantic_search is not None:
+            try:
+                # Always validate returned IDs against *this patient's* SQL notes.
+                semantic_hits = semantic_search(patient_id, question, 2)
+                own_notes = {n["document_id"]: n for n in candidates}
+                seen_ids = set()
+                for hit in semantic_hits:
+                    doc_id = hit["document_id"]
+                    if doc_id in own_notes and doc_id not in seen_ids:
+                        notes.append(dict(own_notes[doc_id]))
+                        seen_ids.add(doc_id)
+                if notes:
+                    retrieval_method = "semantic_vector_cosine"
+            except Exception:
+                # Trusted local embedder failures must never block the safe demo;
+                # the SQL patient filter still constrains all returned documents.
+                notes = []
+        if not notes:
+            qterms = _tokens(question)
+            scored = [(len(qterms & _tokens(n["text"])), n["date"], n) for n in candidates]
+            notes = [n for _, _, n in sorted(scored, key=lambda x: (x[0], x[1]), reverse=True)[:2]]
+            retrieval_method = "lexical_keywords"
+        # 'Most recent' explicitly requests the newest note, regardless of similarity.
+        if any(phrase in question.lower() for phrase in ("most recent", "latest", "newest")) and notes and candidates:
+            newest = candidates[0]
+            if newest["document_id"] not in {n["document_id"] for n in notes}:
+                notes = [newest] + notes[:1]
+            else:
+                notes = [newest] + [n for n in notes if n["document_id"] != newest["document_id"]]
     for r in obs:
         r["source_marker"] = f"[SQL:{r['observation_id']}]"
     for c in conditions:
@@ -189,8 +220,9 @@ def retrieve_evidence(conn: sqlite3.Connection, patient_id: str, question: str, 
         n["source_marker"] = f"[DOC:{n['document_id']}#chunk:0]"
     return {"patient": patient[0], "question": question, "routing": {"mode": mode,
             "measurements": want_measurements, "notes": want_notes, "medications": want_medications, "conditions": wants_conditions},
+            "document_retrieval": {"method": retrieval_method, "vector_index_used": retrieval_method == "semantic_vector_cosine"},
             "observations": obs, "conditions": conditions, "medications": meds, "notes": notes,
-            "limitations": "Hand-authored fictional fixtures. Structural labels do not establish clinical validity. Lexical document matching is not vector RAG."}
+            "limitations": "Hand-authored fictional fixtures. Structural labels do not establish clinical validity. Vector similarity or lexical matching does not verify factual relevance or medical truth."}
 
 
 def allowed_markers(evidence: dict) -> set[str]:
