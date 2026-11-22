@@ -27,6 +27,7 @@ from demo_backend import (  # noqa: E402
 )
 from remote_inference import RemoteInferenceError, remote_qwen_answer  # noqa: E402
 from suggested_questions import SUGGESTED_QUESTIONS  # noqa: E402
+from usage_controls import SharedProcessBudget, UsagePolicy, reserve_hosted_call  # noqa: E402
 
 st.set_page_config(
     page_title="DataHealth AI | Public Demo",
@@ -46,6 +47,15 @@ st.markdown("""
 @st.cache_data(show_spinner=False)
 def fixtures() -> dict:
     return load_fixtures(HERE / "sample_records.json")
+
+# Shared across sessions in one Streamlit server process only. This best-effort
+# limit resets on deployment/restart and is NOT an account-level spending cap.
+@st.cache_resource(show_spinner=False)
+def hosted_budget() -> SharedProcessBudget:
+    return SharedProcessBudget(max_calls=24, window_seconds=3600)
+
+HOSTED_POLICY = UsagePolicy(session_max_calls=6, session_cooldown_seconds=15,
+                            process_max_calls=24, process_window_seconds=3600)
 
 
 def secret(name: str) -> str:
@@ -149,7 +159,9 @@ with st.sidebar:
     st.caption("Hosted model available only when the project owner configures a provider and API key." if not remote_ready else
                "A third-party provider processes the selected fictional question and evidence; limits and possible charges apply.")
     if remote_ready:
-        st.caption("Public demo: session request cap is not a substitute for provider-side quotas and billing limits.")
+        st.caption("Demo limits: 6 hosted requests/session, 15s cooldown, and "
+                   "24 requests/hour per running server process. "
+                   "These are best-effort, not provider billing protections.")
     if st.button("Clear conversation", width="stretch"):
         st.session_state["messages"] = []
         st.rerun()
@@ -207,10 +219,15 @@ with chat_tab:
         status = "EVIDENCE_ONLY"
         fallback_reason = None
         if remote_ready and allowed_markers(evidence):
-            if st.session_state.get("hosted_calls", 0) >= 8:
-                st.info("Per-session hosted model call limit reached; showing evidence-only preview.")
+            allowed, usage_reason = reserve_hosted_call(
+                st.session_state, hosted_budget(), policy=HOSTED_POLICY
+            )
+            if not allowed:
+                status = "EVIDENCE_ONLY_FALLBACK"
+                fallback_reason = usage_reason
+                st.info("Hosted request not sent (" + usage_reason + "). "
+                        "The evidence-only response remains available.")
             else:
-                st.session_state["hosted_calls"] = st.session_state.get("hosted_calls", 0) + 1
                 try:
                     generated = remote_qwen_answer(evidence=evidence, question=query,
                         api_base=api_base, api_key=api_key, model_id=model_id)
