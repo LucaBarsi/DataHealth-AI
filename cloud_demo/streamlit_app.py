@@ -26,6 +26,7 @@ from demo_backend import (  # noqa: E402
     load_fixtures, measurement_options, open_demo_database, retrieve_evidence, series_for_patient,
 )
 from remote_inference import RemoteInferenceError, remote_qwen_answer  # noqa: E402
+from suggested_questions import SUGGESTED_QUESTIONS  # noqa: E402
 
 st.set_page_config(
     page_title="DataHealth AI | Public Demo",
@@ -59,7 +60,7 @@ def show_evidence(evidence: dict) -> None:
     with st.expander("Inspect retrieved sources and quality metadata", expanded=False):
         st.caption("These are patient-scoped fixtures; citation IDs identify the sample rows only.")
         for label, key in (("Structured measurements", "observations"),
-                           ("Medication requests", "medications"), ("Clinical notes", "notes")):
+                           ("Recorded conditions", "conditions"), ("Medication requests", "medications"), ("Clinical notes", "notes")):
             st.markdown("**" + label + "**")
             if evidence.get(key):
                 st.dataframe(evidence[key], width="stretch", hide_index=True)
@@ -146,7 +147,9 @@ with st.sidebar:
     st.markdown('<div class="dh-sidebar-section">INFERENCE MODE</div>', unsafe_allow_html=True)
     st.markdown("**Hosted Qwen configured**" if remote_ready else "**Evidence-only preview**")
     st.caption("Hosted model available only when the project owner configures a provider and API key." if not remote_ready else
-               "Configured third-party inference receives selected fictional prompts and evidence.")
+               "A third-party provider processes the selected fictional question and evidence; limits and possible charges apply.")
+    if remote_ready:
+        st.caption("Public demo: session request cap is not a substitute for provider-side quotas and billing limits.")
     if st.button("Clear conversation", width="stretch"):
         st.session_state["messages"] = []
         st.rerun()
@@ -176,27 +179,28 @@ chat_tab, analytics_tab = st.tabs(["Clinical Assistant", "Analytics Dashboard"])
 with chat_tab:
     st.subheader("Ask about a selected synthetic patient")
     st.caption("Answers use only this patient's demo fixtures. In Evidence-only mode, no LLM is called.")
-    suggestions = [
-        ("Latest measurements", "Summarize the latest vital signs and laboratory measurements with units and sources."),
-        ("Clinical history", "Summarize the most recent clinical note with its source."),
-        ("Medication requests", "What structured medication requests are available for this patient?"),
-        ("Combined evidence", "Compare recent vital signs with the latest clinical note. Cite both sources."),
-    ]
+    st.markdown("**Suggested questions**")
+    st.caption("Click any prompt to ask about the selected fictional patient. Suggested prompts use automatic source routing.")
+    suggestions = SUGGESTED_QUESTIONS
     choice = None
-    buttons = st.columns(2)
+    buttons = st.columns(3)
     for i, (label, question) in enumerate(suggestions):
-        with buttons[i % 2]:
+        with buttons[i % 3]:
             if st.button(label, key="question_"+str(i), width="stretch", help=question):
                 choice = question
     for idx, item in enumerate(st.session_state.get("messages", [])):
         with st.chat_message(item["role"]):
             st.markdown(item["text"])
             if item["role"] == "assistant" and item.get("evidence"):
+                st.caption("Retrieval status: " + item.get("status", "UNSPECIFIED") + " · Citation IDs do not prove factual support.")
                 show_evidence(item["evidence"])
     typed = st.chat_input("Ask about the selected synthetic patient…", max_chars=1000)
     query = typed or choice
     if query:
-        evidence = retrieve_evidence(conn, selected_id, query, mode=mode)
+        # Suggestions use reliable auto routing regardless of the custom sidebar mode.
+        # Custom typed questions continue to respect the sidebar selection.
+        effective_mode = "auto" if choice and not typed else mode
+        evidence = retrieve_evidence(conn, selected_id, query, mode=effective_mode)
         response = evidence_only_answer(evidence)
         status = "EVIDENCE_ONLY"
         if remote_ready and allowed_markers(evidence):
@@ -231,6 +235,7 @@ with chat_tab:
 with analytics_tab:
     st.subheader("Explore the illustration dataset")
     st.caption("These records are handcrafted public demonstration fixtures, not the 112-patient local Synthea Gold Layer.")
+    st.caption(f"Condition records in scope: {totals['conditions']} · Entries are placeholder labels, not clinical diagnoses.")
     chart_panel(conn, selected_id, key="main")
     with st.expander("Dataset inventory"):
         st.json({"dataset_name": data["dataset_name"], "provenance": data["dataset_provenance"], "records": totals})

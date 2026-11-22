@@ -9,19 +9,93 @@
       "gender": "female",
       "birth_date": "1992-05-18",
       "observations": [
-        {"observation_id": "DEMO-O001", "code": "8867-4", "display": "Heart rate", "value": 78, "unit": "/min", "timestamp": "2026-08-05T09:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O002", "code": "8867-4", "display": "Heart rate", "value": 82, "unit": "/min", "timestamp": "2026-09-12T09:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O003", "code": "8867-4", "display": "Heart rate", "value": 79, "unit": "/min", "timestamp": "2026-10-15T09:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O004", "code": "9279-1", "display": "Respiratory rate", "value": 16, "unit": "/min", "timestamp": "2026-10-15T09:05:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O005", "code": "8480-6", "display": "Systolic blood pressure", "value": 118, "unit": "mm[Hg]", "timestamp": "2026-10-15T09:05:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O006", "code": "8462-4", "display": "Diastolic blood pressure", "value": 76, "unit": "mm[Hg]", "timestamp": "2026-10-15T09:05:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O007", "code": "2093-3", "display": "Total cholesterol", "value": 194, "unit": "mg/dL", "timestamp": "2026-09-12T10:15:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"}
+        {
+          "observation_id": "DEMO-O001",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 78,
+          "unit": "/min",
+          "timestamp": "2026-08-05T09:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O002",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 82,
+          "unit": "/min",
+          "timestamp": "2026-09-12T09:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O003",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 79,
+          "unit": "/min",
+          "timestamp": "2026-10-15T09:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O004",
+          "code": "9279-1",
+          "display": "Respiratory rate",
+          "value": 16,
+          "unit": "/min",
+          "timestamp": "2026-10-15T09:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O005",
+          "code": "8480-6",
+          "display": "Systolic blood pressure",
+          "value": 118,
+          "unit": "mm[Hg]",
+          "timestamp": "2026-10-15T09:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O006",
+          "code": "8462-4",
+          "display": "Diastolic blood pressure",
+          "value": 76,
+          "unit": "mm[Hg]",
+          "timestamp": "2026-10-15T09:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O007",
+          "code": "2093-3",
+          "display": "Total cholesterol",
+          "value": 194,
+          "unit": "mg/dL",
+          "timestamp": "2026-09-12T10:15:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
       ],
       "medications": [
-        {"request_id": "DEMO-M001", "medication": "Example medication A", "status": "active", "authored_on": "2026-09-12"}
+        {
+          "request_id": "DEMO-M001",
+          "medication": "Example medication A",
+          "status": "active",
+          "authored_on": "2026-09-12"
+        }
       ],
       "notes": [
-        {"document_id": "DEMO-D001", "date": "2026-10-15", "type": "Synthetic outpatient note", "text": "Illustrative outpatient note: patient reports no new complaints. A follow-up visit was documented. This note is invented for testing software and is not clinical evidence."}
+        {
+          "document_id": "DEMO-D001",
+          "date": "2026-10-15",
+          "type": "Synthetic outpatient note",
+          "text": "Illustrative outpatient note: patient reports no new complaints. A follow-up visit was documented. This note is invented for testing software and is not clinical evidence."
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "DEMO-C001",
+          "label": "Illustrative condition entry A (fictional)",
+          "status": "active",
+          "recorded_on": "2026-09-18"
+        }
       ]
     },
     {
@@ -30,15 +104,68 @@
       "gender": "male",
       "birth_date": "1984-09-23",
       "observations": [
-        {"observation_id": "DEMO-O008", "code": "8867-4", "display": "Heart rate", "value": 71, "unit": "/min", "timestamp": "2026-07-20T08:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O009", "code": "8867-4", "display": "Heart rate", "value": 75, "unit": "/min", "timestamp": "2026-09-03T08:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O010", "code": "8867-4", "display": "Heart rate", "value": 74, "unit": "/min", "timestamp": "2026-11-01T08:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O011", "code": "2339-0", "display": "Glucose", "value": 96, "unit": "mg/dL", "timestamp": "2026-09-03T08:30:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O012", "code": "2339-0", "display": "Glucose", "value": 99, "unit": "mg/dL", "timestamp": "2026-11-01T08:30:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"}
+        {
+          "observation_id": "DEMO-O008",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 71,
+          "unit": "/min",
+          "timestamp": "2026-07-20T08:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O009",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 75,
+          "unit": "/min",
+          "timestamp": "2026-09-03T08:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O010",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 74,
+          "unit": "/min",
+          "timestamp": "2026-11-01T08:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O011",
+          "code": "2339-0",
+          "display": "Glucose",
+          "value": 96,
+          "unit": "mg/dL",
+          "timestamp": "2026-09-03T08:30:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O012",
+          "code": "2339-0",
+          "display": "Glucose",
+          "value": 99,
+          "unit": "mg/dL",
+          "timestamp": "2026-11-01T08:30:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
       ],
       "medications": [],
       "notes": [
-        {"document_id": "DEMO-D002", "date": "2026-11-01", "type": "Synthetic follow-up note", "text": "Illustrative follow-up note: laboratory measurements were collected for software testing. No active medication is mentioned in this document; the note does not establish absence of prescriptions."}
+        {
+          "document_id": "DEMO-D002",
+          "date": "2026-11-01",
+          "type": "Synthetic follow-up note",
+          "text": "Illustrative follow-up note: laboratory measurements were collected for software testing. No active medication is mentioned in this document; the note does not establish absence of prescriptions."
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "DEMO-C002",
+          "label": "Illustrative condition entry B (fictional)",
+          "status": "resolved",
+          "recorded_on": "2026-07-20"
+        }
       ]
     },
     {
@@ -47,14 +174,76 @@
       "gender": "female",
       "birth_date": "2001-02-04",
       "observations": [
-        {"observation_id": "DEMO-O013", "code": "8867-4", "display": "Heart rate", "value": 91, "unit": "/min", "timestamp": "2026-08-28T11:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O014", "code": "8867-4", "display": "Heart rate", "value": 87, "unit": "/min", "timestamp": "2026-10-02T11:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O015", "code": "8867-4", "display": "Heart rate", "value": 89, "unit": "/min", "timestamp": "2026-11-07T11:00:00Z", "quality_status": "REVIEW_REQUIRED"},
-        {"observation_id": "DEMO-O016", "code": "29463-7", "display": "Body weight", "value": 60.5, "unit": "kg", "timestamp": "2026-10-02T11:05:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O017", "code": "29463-7", "display": "Body weight", "value": 61.2, "unit": "kg", "timestamp": "2026-11-07T11:05:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"}
+        {
+          "observation_id": "DEMO-O013",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 91,
+          "unit": "/min",
+          "timestamp": "2026-08-28T11:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O014",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 87,
+          "unit": "/min",
+          "timestamp": "2026-10-02T11:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O015",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 89,
+          "unit": "/min",
+          "timestamp": "2026-11-07T11:00:00Z",
+          "quality_status": "REVIEW_REQUIRED"
+        },
+        {
+          "observation_id": "DEMO-O016",
+          "code": "29463-7",
+          "display": "Body weight",
+          "value": 60.5,
+          "unit": "kg",
+          "timestamp": "2026-10-02T11:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O017",
+          "code": "29463-7",
+          "display": "Body weight",
+          "value": 61.2,
+          "unit": "kg",
+          "timestamp": "2026-11-07T11:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
       ],
-      "medications": [{"request_id": "DEMO-M002", "medication": "Example medication B", "status": "completed", "authored_on": "2026-08-28"}],
-      "notes": [{"document_id": "DEMO-D003", "date": "2026-11-07", "type": "Synthetic history note", "text": "Illustrative history note: vital measurements were entered with a flagged heart rate observation requiring structural review. No clinical validation is implied."}]
+      "medications": [
+        {
+          "request_id": "DEMO-M002",
+          "medication": "Example medication B",
+          "status": "completed",
+          "authored_on": "2026-08-28"
+        }
+      ],
+      "notes": [
+        {
+          "document_id": "DEMO-D003",
+          "date": "2026-11-07",
+          "type": "Synthetic history note",
+          "text": "Illustrative history note: vital measurements were entered with a flagged heart rate observation requiring structural review. No clinical validation is implied."
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "DEMO-C003",
+          "label": "Illustrative condition entry C (fictional)",
+          "status": "active",
+          "recorded_on": "2026-08-28"
+        }
+      ]
     },
     {
       "patient_id": "DEMO-P004",
@@ -62,12 +251,44 @@
       "gender": "male",
       "birth_date": "2010-12-11",
       "observations": [
-        {"observation_id": "DEMO-O018", "code": "8867-4", "display": "Heart rate", "value": 80, "unit": "/min", "timestamp": "2026-08-19T14:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O019", "code": "8867-4", "display": "Heart rate", "value": 77, "unit": "/min", "timestamp": "2026-10-22T14:00:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"},
-        {"observation_id": "DEMO-O020", "code": "9279-1", "display": "Respiratory rate", "value": 17, "unit": "/min", "timestamp": "2026-10-22T14:05:00Z", "quality_status": "PASS_STRUCTURAL_CHECKS"}
+        {
+          "observation_id": "DEMO-O018",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 80,
+          "unit": "/min",
+          "timestamp": "2026-08-19T14:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O019",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 77,
+          "unit": "/min",
+          "timestamp": "2026-10-22T14:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O020",
+          "code": "9279-1",
+          "display": "Respiratory rate",
+          "value": 17,
+          "unit": "/min",
+          "timestamp": "2026-10-22T14:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
       ],
       "medications": [],
-      "notes": [{"document_id": "DEMO-D004", "date": "2026-10-22", "type": "Synthetic routine note", "text": "Illustrative routine follow-up note: measurements were recorded for demonstration. There is no recommendation for care in this invented document."}]
+      "notes": [
+        {
+          "document_id": "DEMO-D004",
+          "date": "2026-10-22",
+          "type": "Synthetic routine note",
+          "text": "Illustrative routine follow-up note: measurements were recorded for demonstration. There is no recommendation for care in this invented document."
+        }
+      ],
+      "conditions": []
     }
   ]
 }
