@@ -193,6 +193,8 @@ with chat_tab:
             st.markdown(item["text"])
             if item["role"] == "assistant" and item.get("evidence"):
                 st.caption("Retrieval status: " + item.get("status", "UNSPECIFIED") + " · Citation IDs do not prove factual support.")
+                if item.get("fallback_reason"):
+                    st.caption("Hosted-model diagnostic: " + item["fallback_reason"])
                 show_evidence(item["evidence"])
     typed = st.chat_input("Ask about the selected synthetic patient…", max_chars=1000)
     query = typed or choice
@@ -203,6 +205,7 @@ with chat_tab:
         evidence = retrieve_evidence(conn, selected_id, query, mode=effective_mode)
         response = evidence_only_answer(evidence)
         status = "EVIDENCE_ONLY"
+        fallback_reason = None
         if remote_ready and allowed_markers(evidence):
             if st.session_state.get("hosted_calls", 0) >= 8:
                 st.info("Per-session hosted model call limit reached; showing evidence-only preview.")
@@ -217,19 +220,27 @@ with chat_tab:
                         status = "CITATION_IDS_VALID"
                     else:
                         status = "EVIDENCE_ONLY_FALLBACK"
-                except (ValueError, RemoteInferenceError):
+                        fallback_reason = "CITATION_CHECK_FAILED"
+                except RemoteInferenceError as exc:
                     status = "EVIDENCE_ONLY_FALLBACK"
+                    fallback_reason = exc.code
+                except ValueError:
+                    status = "EVIDENCE_ONLY_FALLBACK"
+                    fallback_reason = "INVALID_INFERENCE_CONFIGURATION"
         elif remote_ready:
             status = "NO_ELIGIBLE_EVIDENCE"
         st.session_state["messages"].extend([
             {"role":"user", "text":query},
-            {"role":"assistant", "text":response, "status":status, "evidence":evidence},
+            {"role":"assistant", "text":response, "status":status,
+             "fallback_reason":fallback_reason, "evidence":evidence},
         ])
         with st.chat_message("user"):
             st.markdown(query)
         with st.chat_message("assistant"):
             st.markdown(response)
             st.caption("Retrieval status: " + status + " · Exact citation IDs are not proof of factual support.")
+            if fallback_reason:
+                st.caption("Hosted-model diagnostic: " + fallback_reason)
             show_evidence(evidence)
 
 with analytics_tab:
