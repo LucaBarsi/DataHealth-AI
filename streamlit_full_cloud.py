@@ -125,7 +125,10 @@ def initialize_assets(token: str) -> bool:
 
 def launch() -> None:
     try:
-        token = str(st.secrets.get("HF_TOKEN", "")).strip()
+        try:
+            token = str(st.secrets.get("HF_TOKEN", "")).strip()
+        except (KeyError, FileNotFoundError):
+            token = ""
         # Existing local assets can be verified without a Hugging Face token.
         # The hosted app still requires HF_TOKEN when it must download them.
         if not token and not (DATABASE.is_file() and CHROMA_DIR.is_dir()):
