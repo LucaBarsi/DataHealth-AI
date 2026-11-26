@@ -2,7 +2,7 @@
 
 **Data that connects. Insights you can trace.**
 
-This directory organizes the technical documentation for the **local, synthetic-data DataHealth AI research prototype**. It is a **navigation index**: existing files remain in their current locations to preserve links and Git history.
+This directory organizes the technical documentation for the **local, synthetic-data DataHealth AI research prototype**. It is a **navigation index**; historical phase README files were moved into `development_history/` during Phase 22, with relative Markdown links updated.
 
 > **Synthetic data only.** This project is not intended for clinical decisions or use with real patient information. Structural quality checks and valid source identifiers do not establish clinical correctness.
 
@@ -66,7 +66,7 @@ For an overview, setup instructions, screenshots, implemented features, and curr
 
 ## Development history — phase READMEs
 
-Phase-specific reports remain at the repository root until a separate migration with complete relative-link validation is approved. They are retained as the project's technical development record.
+Phase-specific historical reports are stored in `docs/development_history/` as the project's technical development record. Their relative Markdown links were updated and checked during Phase 22.
 
 | Phase / topic | Document |
 |---|---|
@@ -95,4 +95,4 @@ Phase-specific reports remain at the repository root until a separate migration 
 - [Ubuntu/WSL Spark requirements](../requirements-spark.txt)
 - Historical `requirements_phase*.txt` files remain at repository root.
 
-**Phase 22 release note:** This index lists documents known to be present during the documentation audit. A check for local Markdown links found no missing targets before reorganization. File existence does not verify technical accuracy, screenshots, external URLs, or clean-install reproducibility. No existing file has been moved as part of this indexing step.
+**Phase 22 release note:** The migration moved 23 historical Markdown documents and updated 33 local Markdown links; the post-migration link check reported no missing local targets. This does not validate screenshots, external URLs, technical accuracy, or full clean-machine reproducibility. The source release was committed and pushed to the private GitHub `main` branch. See the [Phase 22 final validation report](../PHASE22_FINAL_VALIDATION.md).
