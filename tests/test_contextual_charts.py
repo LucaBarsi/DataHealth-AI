@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -123,7 +124,7 @@ class ContextualChartsTests(unittest.TestCase):
         self.assertEqual(len(limited["rows"]), 1)
         with self.assertRaises(ValueError):
             chart_targets(self.context, "p1", max_targets=0)
-        with sqlite3.connect(self.db) as con:
+        with closing(sqlite3.connect(self.db)) as con:
             self.assertEqual(con.execute("SELECT COUNT(*) FROM observation_values").fetchone()[0], 4)
 
     def test_app_integration_remains_explicit_and_syntactically_valid(self):

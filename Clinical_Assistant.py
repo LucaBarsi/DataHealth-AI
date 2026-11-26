@@ -7,11 +7,12 @@ Synthetic Synthea records only. This prototype is not for clinical use.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from html import escape
+from pathlib import Path
 import sqlite3
 
 import plotly.graph_objects as go
-from pathlib import Path
 
 import streamlit as st
 
@@ -62,6 +63,19 @@ def evidence_panel(result: dict) -> None:
 
 
 
+def format_recorded_time_utc(raw_timestamp: object) -> str:
+    """Format a recorded UTC timestamp without silently changing naive dates."""
+    if not isinstance(raw_timestamp, str) or not raw_timestamp:
+        return "Not recorded"
+    try:
+        timestamp = datetime.fromisoformat(raw_timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        return raw_timestamp
+    if timestamp.tzinfo is None:
+        return raw_timestamp
+    return timestamp.astimezone(timezone.utc).strftime("%b %d, %Y · %H:%M:%S UTC")
+
+
 def contextual_chart_panel(result: dict, patient_id: str, *, key: str) -> None:
     """Show a read-only patient trend alongside the answer's SQL sources.
 
@@ -109,43 +123,76 @@ def contextual_chart_panel(result: dict, patient_id: str, *, key: str) -> None:
             st.info("No eligible numeric measurements. Enable flagged records to inspect review-required values.")
             return
 
-        passing = [r for r in rows if r.get("quality_status") != "REVIEW_REQUIRED"]
-        flagged = [r for r in rows if r.get("quality_status") == "REVIEW_REQUIRED"]
-        fig = go.Figure()
-        if passing:
-            fig.add_trace(go.Scatter(
-                x=[r["effective_datetime_utc"] for r in passing],
-                y=[r["value_numeric"] for r in passing],
-                mode="lines+markers" if len(passing) > 1 else "markers",
-                marker={"color": "#4ADAC5", "size": 9},
-                line={"color": "#4ADAC5", "width": 2},
-                name="Structural checks passed",
-                customdata=[r["observation_id"] for r in passing],
-                hovertemplate="%{x}<br>Value: %{y}<br>Observation ID: %{customdata}<extra></extra>",
-            ))
-        if flagged:
-            fig.add_trace(go.Scatter(
-                x=[r["effective_datetime_utc"] for r in flagged],
-                y=[r["value_numeric"] for r in flagged],
-                mode="markers",
-                marker={"color": "#F2C078", "size": 12, "symbol": "diamond"},
-                name="Review required",
-                customdata=[r["observation_id"] for r in flagged],
-                hovertemplate="%{x}<br>Value: %{y}<br>Review required<br>Observation ID: %{customdata}<extra></extra>",
-            ))
-        fig.update_layout(
-            height=330, paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font={"color": "#C5DBEE"},
-            margin={"l": 18, "r": 18, "t": 16, "b": 20},
-            xaxis={"title": "Recorded time (UTC)", "showgrid": False},
-            yaxis={"title": chosen.unit or "Unit not recorded", "gridcolor": "rgba(150,185,220,.14)"},
-            showlegend=bool(flagged and passing),
-        )
-        st.plotly_chart(fig, width="stretch", theme=None, key=f"linked_chart_{key}",
-                        config={"displaylogo": False, "scrollZoom": False})
-        if len(rows) < 2:
-            st.caption("Only one eligible point is available; this is not a longitudinal trend.")
+        if len(rows) == 1:
+            # A single eligible measurement is not a longitudinal trend.
+            # Keep the source timestamp, observation ID, and quality status visible.
+            record = rows[0]
+            with st.container(border=True):
+                st.caption("SINGLE RECORDED MEASUREMENT")
+                value_col, details_col = st.columns([2, 1])
+                with value_col:
+                    value_label = f"{record['value_numeric']} {chosen.unit}".strip()
+                    st.metric(chosen.display, value_label)
+                    st.caption("Only one eligible measurement is available; no longitudinal trend can be shown.")
+                with details_col:
+                    st.markdown("**Recorded time**")
+                    st.write(format_recorded_time_utc(record.get("effective_datetime_utc")))
+                    st.markdown("**Data quality**")
+                    quality_status = str(record.get("quality_status") or "Not specified")
+                    if quality_status == "REVIEW_REQUIRED":
+                        st.warning("REVIEW_REQUIRED")
+                    else:
+                        st.caption(quality_status)
+                    if record.get("quality_flags"):
+                        st.caption(f"Quality flags: {record['quality_flags']}")
+                    st.caption(f"Observation ID: `{record['observation_id']}`")
+        else:
+            passing = [r for r in rows if r.get("quality_status") != "REVIEW_REQUIRED"]
+            flagged = [r for r in rows if r.get("quality_status") == "REVIEW_REQUIRED"]
+            fig = go.Figure()
+            if passing:
+                fig.add_trace(go.Scatter(
+                    x=[r["effective_datetime_utc"] for r in passing],
+                    y=[r["value_numeric"] for r in passing],
+                    mode="lines+markers" if len(passing) > 1 else "markers",
+                    marker={"color": "#4ADAC5", "size": 9},
+                    line={"color": "#4ADAC5", "width": 2},
+                    name="Structural checks passed",
+                    customdata=[r["observation_id"] for r in passing],
+                    hovertemplate="%{x}<br>Value: %{y}<br>Observation ID: %{customdata}<extra></extra>",
+                ))
+            if flagged:
+                fig.add_trace(go.Scatter(
+                    x=[r["effective_datetime_utc"] for r in flagged],
+                    y=[r["value_numeric"] for r in flagged],
+                    mode="markers",
+                    marker={"color": "#F2C078", "size": 12, "symbol": "diamond"},
+                    name="Review required",
+                    customdata=[r["observation_id"] for r in flagged],
+                    hovertemplate="%{x}<br>Value: %{y}<br>Review required<br>Observation ID: %{customdata}<extra></extra>",
+                ))
+            fig.update_layout(
+                height=370, paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font={"color": "#C5DBEE"},
+                margin={"l": 64, "r": 24, "t": 20, "b": 75},
+                xaxis={
+                    "title": {"text": "Recorded time (UTC)", "standoff": 20},
+                    "showgrid": False,
+                    "type": "date",
+                    "tickformat": "%b %d<br>%Y",
+                    "nticks": 5,
+                    "automargin": True,
+                },
+                yaxis={
+                    "title": {"text": chosen.unit or "Unit not recorded", "standoff": 16},
+                    "gridcolor": "rgba(150,185,220,.14)",
+                    "automargin": True,
+                },
+                showlegend=bool(flagged and passing),
+            )
+            st.plotly_chart(fig, width="stretch", theme=None, key=f"linked_chart_{key}",
+                            config={"displaylogo": False, "scrollZoom": False})
         if series["truncated"]:
             st.warning("Chart limited to the most recent 500 matching records. It does not show the full history.")
         st.caption(

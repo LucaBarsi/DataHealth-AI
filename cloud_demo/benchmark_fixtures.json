@@ -1,0 +1,462 @@
+{
+  "dataset_name": "DataHealth AI Phase 17.1: separate retrieval benchmark fixtures",
+  "dataset_provenance": "Hand-authored fictional notes and original cloud demo sample; no real patient records",
+  "synthetic_only": true,
+  "patients": [
+    {
+      "patient_id": "DEMO-P001",
+      "full_name": "Alex100 Example01",
+      "gender": "female",
+      "birth_date": "1992-05-18",
+      "observations": [
+        {
+          "observation_id": "DEMO-O001",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 78,
+          "unit": "/min",
+          "timestamp": "2026-08-05T09:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O002",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 82,
+          "unit": "/min",
+          "timestamp": "2026-09-12T09:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O003",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 79,
+          "unit": "/min",
+          "timestamp": "2026-10-15T09:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O004",
+          "code": "9279-1",
+          "display": "Respiratory rate",
+          "value": 16,
+          "unit": "/min",
+          "timestamp": "2026-10-15T09:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O005",
+          "code": "8480-6",
+          "display": "Systolic blood pressure",
+          "value": 118,
+          "unit": "mm[Hg]",
+          "timestamp": "2026-10-15T09:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O006",
+          "code": "8462-4",
+          "display": "Diastolic blood pressure",
+          "value": 76,
+          "unit": "mm[Hg]",
+          "timestamp": "2026-10-15T09:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O007",
+          "code": "2093-3",
+          "display": "Total cholesterol",
+          "value": 194,
+          "unit": "mg/dL",
+          "timestamp": "2026-09-12T10:15:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
+      ],
+      "medications": [
+        {
+          "request_id": "DEMO-M001",
+          "medication": "Example medication A",
+          "status": "active",
+          "authored_on": "2026-09-12"
+        }
+      ],
+      "notes": [
+        {
+          "document_id": "DEMO-D001",
+          "date": "2026-10-15",
+          "type": "Synthetic outpatient note",
+          "text": "Illustrative outpatient note: patient reports no new complaints. A follow-up visit was documented. This note is invented for testing software and is not clinical evidence."
+        },
+        {
+          "document_id": "DEMO-D101",
+          "date": "2026-07-11",
+          "type": "Fictional appointment coordination note",
+          "text": "Administrative scheduling team confirmed that a follow-up appointment was reserved on the calendar and notification was delivered. No care recommendations are implied."
+        },
+        {
+          "document_id": "DEMO-D102",
+          "date": "2026-07-18",
+          "type": "Fictional medication reconciliation workflow note",
+          "text": "Staff compared the illustrative medication request list against an intake checklist during a medication reconciliation workflow. This entry does not establish which drugs were used."
+        },
+        {
+          "document_id": "DEMO-D103",
+          "date": "2026-07-25",
+          "type": "Fictional specimen handling note",
+          "text": "The demonstration blood specimen barcode and container label were checked before the sample was routed to a chemistry analyzer. No biological result is validated."
+        },
+        {
+          "document_id": "DEMO-D104",
+          "date": "2026-08-02",
+          "type": "Fictional allergy documentation note",
+          "text": "Administrative staff reviewed completeness of the allergy documentation field. This checklist does not confirm or rule out any allergies."
+        },
+        {
+          "document_id": "DEMO-D105",
+          "date": "2026-08-09",
+          "type": "Fictional immunization tracking note",
+          "text": "A vaccination history checklist was updated for administrative tracking without confirming that any immunization was administered."
+        },
+        {
+          "document_id": "DEMO-D106",
+          "date": "2026-08-16",
+          "type": "Fictional equipment quality note",
+          "text": "The blood pressure cuff calibration sticker and pulse sensor maintenance record were reviewed during instrument quality checks."
+        },
+        {
+          "document_id": "DEMO-D107",
+          "date": "2026-08-23",
+          "type": "Fictional patient portal note",
+          "text": "Portal registration and secure message delivery were tested using a fictional patient account. No external communication was sent."
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "DEMO-C001",
+          "label": "Illustrative condition entry A (fictional)",
+          "status": "active",
+          "recorded_on": "2026-09-18"
+        }
+      ]
+    },
+    {
+      "patient_id": "DEMO-P002",
+      "full_name": "Morgan200 Sample02",
+      "gender": "male",
+      "birth_date": "1984-09-23",
+      "observations": [
+        {
+          "observation_id": "DEMO-O008",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 71,
+          "unit": "/min",
+          "timestamp": "2026-07-20T08:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O009",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 75,
+          "unit": "/min",
+          "timestamp": "2026-09-03T08:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O010",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 74,
+          "unit": "/min",
+          "timestamp": "2026-11-01T08:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O011",
+          "code": "2339-0",
+          "display": "Glucose",
+          "value": 96,
+          "unit": "mg/dL",
+          "timestamp": "2026-09-03T08:30:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O012",
+          "code": "2339-0",
+          "display": "Glucose",
+          "value": 99,
+          "unit": "mg/dL",
+          "timestamp": "2026-11-01T08:30:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
+      ],
+      "medications": [],
+      "notes": [
+        {
+          "document_id": "DEMO-D002",
+          "date": "2026-11-01",
+          "type": "Synthetic follow-up note",
+          "text": "Illustrative follow-up note: laboratory measurements were collected for software testing. No active medication is mentioned in this document; the note does not establish absence of prescriptions."
+        },
+        {
+          "document_id": "DEMO-D201",
+          "date": "2026-07-12",
+          "type": "Fictional specimen tracking note",
+          "text": "A mock laboratory sample collection label was matched to a specimen tracking number before analysis. This is a simulated laboratory workflow."
+        },
+        {
+          "document_id": "DEMO-D202",
+          "date": "2026-07-19",
+          "type": "Fictional discharge logistics note",
+          "text": "The simulated discharge paperwork was routed to the front office for filing; no clinical discharge advice was provided."
+        },
+        {
+          "document_id": "DEMO-D203",
+          "date": "2026-07-26",
+          "type": "Fictional clinical follow-up scheduling note",
+          "text": "A return appointment was entered into the demonstration schedule after a telephone reminder. No clinical instructions were issued."
+        },
+        {
+          "document_id": "DEMO-D204",
+          "date": "2026-08-03",
+          "type": "Fictional laboratory quality control note",
+          "text": "The mock laboratory chemistry analyzer quality control log was reviewed to confirm equipment documentation had been completed."
+        },
+        {
+          "document_id": "DEMO-D205",
+          "date": "2026-08-10",
+          "type": "Fictional pharmacy form note",
+          "text": "A simulated pharmacy request form was checked for missing administrative fields; the note does not prove medication use."
+        },
+        {
+          "document_id": "DEMO-D206",
+          "date": "2026-08-17",
+          "type": "Fictional demographic verification note",
+          "text": "The fictional demographic registration record was compared with an intake form for clerical accuracy."
+        },
+        {
+          "document_id": "DEMO-D207",
+          "date": "2026-08-24",
+          "type": "Fictional imaging administration note",
+          "text": "A mock imaging appointment request was logged and its internal reference number verified. No diagnostic image was evaluated."
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "DEMO-C002",
+          "label": "Illustrative condition entry B (fictional)",
+          "status": "resolved",
+          "recorded_on": "2026-07-20"
+        }
+      ]
+    },
+    {
+      "patient_id": "DEMO-P003",
+      "full_name": "Taylor300 Fiction03",
+      "gender": "female",
+      "birth_date": "2001-02-04",
+      "observations": [
+        {
+          "observation_id": "DEMO-O013",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 91,
+          "unit": "/min",
+          "timestamp": "2026-08-28T11:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O014",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 87,
+          "unit": "/min",
+          "timestamp": "2026-10-02T11:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O015",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 89,
+          "unit": "/min",
+          "timestamp": "2026-11-07T11:00:00Z",
+          "quality_status": "REVIEW_REQUIRED"
+        },
+        {
+          "observation_id": "DEMO-O016",
+          "code": "29463-7",
+          "display": "Body weight",
+          "value": 60.5,
+          "unit": "kg",
+          "timestamp": "2026-10-02T11:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O017",
+          "code": "29463-7",
+          "display": "Body weight",
+          "value": 61.2,
+          "unit": "kg",
+          "timestamp": "2026-11-07T11:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
+      ],
+      "medications": [
+        {
+          "request_id": "DEMO-M002",
+          "medication": "Example medication B",
+          "status": "completed",
+          "authored_on": "2026-08-28"
+        }
+      ],
+      "notes": [
+        {
+          "document_id": "DEMO-D003",
+          "date": "2026-11-07",
+          "type": "Synthetic history note",
+          "text": "Illustrative history note: vital measurements were entered with a flagged heart rate observation requiring structural review. No clinical validation is implied."
+        },
+        {
+          "document_id": "DEMO-D301",
+          "date": "2026-07-13",
+          "type": "Fictional vital device maintenance note",
+          "text": "A demonstration heart rate sensor was checked for battery level and cleaning status; no biological interpretation was made."
+        },
+        {
+          "document_id": "DEMO-D302",
+          "date": "2026-07-20",
+          "type": "Fictional chart annotation note",
+          "text": "The clinical chart metadata was audited for missing timestamps and duplicate text labels in a mock record."
+        },
+        {
+          "document_id": "DEMO-D303",
+          "date": "2026-07-27",
+          "type": "Fictional consent form workflow note",
+          "text": "The simulated consent form template was reviewed for the presence of signature fields; no real consent was collected."
+        },
+        {
+          "document_id": "DEMO-D304",
+          "date": "2026-08-04",
+          "type": "Fictional lab report verification note",
+          "text": "Staff checked a demonstration laboratory result printout for unit formatting and report identifiers, without validating clinical findings."
+        },
+        {
+          "document_id": "DEMO-D305",
+          "date": "2026-08-11",
+          "type": "Fictional scheduling reschedule note",
+          "text": "A cancelled mock appointment was moved to a new calendar slot and the change was logged."
+        },
+        {
+          "document_id": "DEMO-D306",
+          "date": "2026-08-18",
+          "type": "Fictional medication inventory note",
+          "text": "Administrative inventory staff verified a sample medication stock ledger and expiry labels. This does not indicate treatment."
+        },
+        {
+          "document_id": "DEMO-D307",
+          "date": "2026-08-25",
+          "type": "Fictional contact preferences note",
+          "text": "A communication preferences form was reviewed to check whether email or telephone was selected for reminders."
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "DEMO-C003",
+          "label": "Illustrative condition entry C (fictional)",
+          "status": "active",
+          "recorded_on": "2026-08-28"
+        }
+      ]
+    },
+    {
+      "patient_id": "DEMO-P004",
+      "full_name": "Jordan400 Mock04",
+      "gender": "male",
+      "birth_date": "2010-12-11",
+      "observations": [
+        {
+          "observation_id": "DEMO-O018",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 80,
+          "unit": "/min",
+          "timestamp": "2026-08-19T14:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O019",
+          "code": "8867-4",
+          "display": "Heart rate",
+          "value": 77,
+          "unit": "/min",
+          "timestamp": "2026-10-22T14:00:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        },
+        {
+          "observation_id": "DEMO-O020",
+          "code": "9279-1",
+          "display": "Respiratory rate",
+          "value": 17,
+          "unit": "/min",
+          "timestamp": "2026-10-22T14:05:00Z",
+          "quality_status": "PASS_STRUCTURAL_CHECKS"
+        }
+      ],
+      "medications": [],
+      "notes": [
+        {
+          "document_id": "DEMO-D004",
+          "date": "2026-10-22",
+          "type": "Synthetic routine note",
+          "text": "Illustrative routine follow-up note: measurements were recorded for demonstration. There is no recommendation for care in this invented document."
+        },
+        {
+          "document_id": "DEMO-D401",
+          "date": "2026-07-14",
+          "type": "Fictional vaccine inventory note",
+          "text": "An example vaccine storage refrigerator temperature log was reviewed for formatting only; no vaccine was administered."
+        },
+        {
+          "document_id": "DEMO-D402",
+          "date": "2026-07-21",
+          "type": "Fictional clinician note indexing note",
+          "text": "An illustrative clinical narrative was tagged with a document category and a search index label to support retrieval tests."
+        },
+        {
+          "document_id": "DEMO-D403",
+          "date": "2026-07-28",
+          "type": "Fictional referral administration note",
+          "text": "A mock referral form was routed to a scheduling inbox and marked received. It does not imply specialty care."
+        },
+        {
+          "document_id": "DEMO-D404",
+          "date": "2026-08-05",
+          "type": "Fictional laboratory courier note",
+          "text": "The specimen transport manifest and pickup timestamp were checked for an imaginary laboratory courier handoff."
+        },
+        {
+          "document_id": "DEMO-D405",
+          "date": "2026-08-12",
+          "type": "Fictional records privacy review note",
+          "text": "A demonstration role-based access audit was performed to confirm that a record search did not expose another fictional patient."
+        },
+        {
+          "document_id": "DEMO-D406",
+          "date": "2026-08-19",
+          "type": "Fictional medication reconciliation note",
+          "text": "The sample medication history section was inspected for consistency with a checklist, without recommending prescriptions."
+        },
+        {
+          "document_id": "DEMO-D407",
+          "date": "2026-08-26",
+          "type": "Fictional diagnostics instrument note",
+          "text": "A mock electrocardiogram cable and equipment maintenance tag were checked; no ECG tracing was interpreted."
+        }
+      ],
+      "conditions": []
+    }
+  ]
+}

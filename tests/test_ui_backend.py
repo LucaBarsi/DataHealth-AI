@@ -1,6 +1,7 @@
 """Offline Phase 9 tests; do not require Streamlit, Ollama, or ChromaDB runtime."""
 from __future__ import annotations
 
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -15,12 +16,15 @@ class UIBackendTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.database = Path(self.temp.name) / "synthetic.db"
-        with sqlite3.connect(self.database) as conn:
-            conn.execute("CREATE TABLE patients (patient_id TEXT, full_name TEXT, gender TEXT, birth_date TEXT)")
-            conn.executemany("INSERT INTO patients VALUES (?,?,?,?)", [
-                ("patient-b", "Beta22", "male", "2000-01-01"),
-                ("patient-a", "Alpha11", "female", "2001-01-01"),
-            ])
+        # The sqlite3 connection context manages transactions, but does not close
+        # the connection. Explicit closing avoids WinError 32 on Windows cleanup.
+        with closing(sqlite3.connect(self.database)) as conn:
+            with conn:
+                conn.execute("CREATE TABLE patients (patient_id TEXT, full_name TEXT, gender TEXT, birth_date TEXT)")
+                conn.executemany("INSERT INTO patients VALUES (?,?,?,?)", [
+                    ("patient-b", "Beta22", "male", "2000-01-01"),
+                    ("patient-a", "Alpha11", "female", "2001-01-01"),
+                ])
 
     def test_patient_list_is_sorted_and_scoped(self):
         patients = ui_backend.list_synthetic_patients(self.database)

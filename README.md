@@ -2,99 +2,117 @@
 
 **Data that connects. Insights you can trace.**
 
-**DataHealth AI** is an educational, locally operated clinical-data intelligence platform that combines synthetic HL7 FHIR records, data-quality workflows, relational analytics, retrieval-augmented generation (RAG), and a source-aware language model in an interactive Streamlit workspace.
+**DataHealth AI** is an educational, local-first clinical-data intelligence prototype built around **synthetic HL7 FHIR R4 data**. It combines quality-aware data engineering, a relational Gold Layer, patient-scoped SQL and document retrieval, a locally run language model, analytics, and exploratory operational forecasting in a Streamlit workspace.
 
 > [!IMPORTANT]
-> **Synthetic data only.** This is a research/portfolio prototype, **not** a clinical decision-support system. It must not be used for diagnosis, treatment, patient monitoring, or decisions about real people. Structural checks and valid citation IDs do not establish clinical correctness.
+> **Synthetic data only.** This is a research and portfolio project, **not** a clinical decision-support system. Do not use it to diagnose, treat, monitor, or make decisions about real people. Passing structural checks and finding valid citation IDs do **not** establish clinical correctness.
 
-**Current status:** functional **local** proof of concept · source repository available on GitHub · **not yet hosted as a public web application**.
+**Project status (Phase 22 review):** functional **local** prototype with a separate Ubuntu/WSL Spark workflow; documentation and release-readiness work is ongoing. The source repository may not yet include the latest uncommitted changes. **No public web deployment** is claimed.
 
 ## Why this project exists
 
-The fictional **DataHealth** organization needs to make healthcare information easier to integrate, audit, explore, and retrieve. Its proposed enterprise problem spans heterogeneous sensor readings, clinical records, data shared across care systems, and operational events. Fragmentation, processing costs, and latency can make a unified view difficult to obtain.
+The fictional **DataHealth** organization represents a common health-data challenge: records, measurements, documents, and operational events are dispersed across systems. This prototype explores how to ingest a synthetic FHIR sample, preserve provenance and quality indicators, retrieve patient-specific evidence, and present interpretable analytics **without using real patient information**.
 
-This implementation deliberately focuses on an **offline, synthetic-data proof of concept**: ingesting selected FHIR resources, preserving their metadata, supporting patient-scoped SQL and document search, and explaining retrieved evidence through a local LLM. It **does not yet** implement live sensor ingestion, hospital integrations, stream processing, or a predictive patient-risk model.
+The project has a local engineering pipeline and an independent Spark/Parquet experimentation path. It does **not** ingest live sensors, integrate with actual hospitals, use Kafka streaming, or deploy managed Azure/AWS services.
 
 ## Application preview
 
 ### Clinical Assistant
 
-Select a synthetic patient, ask questions in English, choose SQL/RAG/hybrid retrieval (or automatic routing), and inspect the cited records and quality flags.
+Select one synthetic patient, ask a question in English, use SQL/RAG/hybrid retrieval (or automatic routing), and inspect cited evidence with quality flags. Responses use a locally running **Qwen 3.5 4B** model through **Ollama**.
 
-![Clinical Assistant showing a sourced synthetic vital-sign summary](assets/screenshots/clinical-assistant.png)
+![Clinical Assistant displaying cited synthetic vital-sign evidence](assets/screenshots/clinical-assistant.png)
 
 ### Analytics Dashboard
 
-Explore population-wide or patient-filtered synthetic data, with observation activity, measurement categories, patient trends, data-quality findings, and operational summaries.
+Explore aggregate or patient-filtered synthetic records, observation activity, measurement categories, data-quality findings, and operational summaries.
 
-![Analytics Dashboard showing the synthetic-data overview](assets/screenshots/analytics-dashboard.png)
+![Analytics Dashboard with a synthetic-data overview](assets/screenshots/analytics-dashboard.png)
 
-### Evidence-linked measurement charts
+### Evidence-linked contextual measurements — Phase 21
 
-For supported structured answers, the assistant offers a history chart queried **directly from SQLite**. Chart values are **not** inferred from LLM-generated text. Measurements with different codes or units are not silently combined.
+For eligible structured answers, the Clinical Assistant re-queries **read-only SQLite Gold Layer data** instead of plotting numbers produced by the LLM. Results are restricted to the selected synthetic patient and grouped by **measurement code and unit**:
 
-![Historical measurement chart linked to structured evidence](assets/screenshots/evidence-linked-chart.png)
+- **Two or more eligible observations:** an interactive time-series chart.
+- **One eligible observation:** a single-value display with unit, UTC date/time, quality status, and observation ID; no trend is implied.
+- **No eligible observations:** an explanation rather than a fabricated chart.
+- Records marked `REVIEW_REQUIRED` are **excluded by default** and included only when the user enables the review filter.
 
-*Screenshots show a local synthetic-data demonstration and may differ slightly from later versions.*
+![Historical measurements linked to structured evidence](assets/screenshots/evidence-linked-chart.png)
 
-## Core capabilities
+*Existing screenshot paths are retained from the earlier README. Verify that all referenced image files are present and reflect the latest UI before publication.*
 
-| Area | Implemented behavior |
-|---|---|
-| **FHIR engineering** | Parse selected Synthea FHIR R4 resources into consistent patient, encounter, observation, condition, diagnostic-report, medication-request, and document tables. |
-| **Metadata and quality** | Preserve source traceability and flag missing or mixed unit codings; avoid automatic clinical recoding when semantics are uncertain. |
-| **Gold analytics** | Read-only, predefined SQLite queries and interactive Plotly charts. |
-| **Document RAG** | Index selected **current** synthetic clinical documents with `nomic-embed-text` and ChromaDB; filter retrieval by patient. |
-| **Clinical Assistant** | Generate English responses with **Qwen 3.5 4B** through locally running Ollama, grounded in retrieved SQL and/or RAG evidence. |
-| **Citation reliability** | Check whether displayed source-marker IDs exist in retrieved evidence; retry once and use an evidence-only fallback if validation still fails. |
-| **Evaluation** | Capture response time, retrieval counts, citation-marker errors, and human-reviewed factual/citation assessments. |
+### Operational ML forecasting — Phase 18
 
-Patient selection and ID filtering in this demo are **not a substitute for real authentication or authorization**.
+The project includes a **local exploratory workload-forecasting** module and Streamlit ML Forecasting page (`src/workload_forecast.py` and `pages/2_ML_Forecasting.py`). This work concerns operational aggregates; it is **not** a clinical prediction or patient-risk model. See [Phase 18 notes](docs/development_history/README_PHASE18.md) and [forecasting methodology](docs/phase18_workload_forecasting.md).
+
+## Implemented capabilities and scope
+
+| Area | What is present in the local project | Important boundary |
+|---|---|---|
+| **FHIR ingestion and quality** | Selected Synthea FHIR R4 resources, metadata auditing, Python transformations, structural review flags | Not complete FHIR conformance or clinical validation |
+| **Gold Layer and analytics** | Relational SQLite database, predefined patient-scoped/read-only SQL queries, Streamlit and Plotly dashboards | No multi-user access control |
+| **Document RAG** | Selected current synthetic notes, `nomic-embed-text` embeddings via Ollama, ChromaDB, patient-scoped retrieval | Source retrieval alone does not prove each answer is correct |
+| **Source-aware assistant** | Qwen 3.5 4B with SQL, RAG, and hybrid retrieval; citation-ID checks and evidence-only fallback | Citation-ID validity is not claim-level factual validation |
+| **Contextual charts (Phase 21)** | Evidence-linked measurement history, single-observation summary, unit isolation and quality filter | No clinical interpretation of values |
+| **Local Spark ETL (Phase 19)** | Separate Ubuntu/WSL 2 workflow using PySpark 4.3.0 and Silver/Gold Parquet outputs | Not a production distributed cluster |
+| **Pipeline consistency audit (Phase 20)** | Read-only checks comparing synthetic FHIR Bundle counts, Spark Parquet aggregates, and an optional SQLite summary | Structural/count consistency, not clinical correctness |
+| **Operational forecasting (Phase 18)** | Local ML experimentation and dashboard page | Not patient-level risk prediction |
+| **Power BI preparation** | Export module and guidance for downstream reporting | Does not mean a Power BI dashboard or service is deployed |
+| **Cloud Demo / retrieval benchmarks** | Local evaluation and optional hosted-inference-oriented code paths, including semantic retrieval experiments | Not evidence of a managed cloud deployment |
 
 ## System architecture
 
+The two engineering paths are deliberately shown separately: the **Python/SQLite application pipeline** and the **Spark/Parquet validation workflow**. They are not represented as a single production lakehouse.
+
 ```mermaid
 flowchart TD
-    A["Synthea — synthetic FHIR R4 records"] --> B["Raw / Bronze: original JSON"]
-    B --> C["Python: ingestion, EDA, metadata audit"]
-    C --> D["Silver: normalized CSV and quality flags"]
-    D --> E["Gold: SQLite relational data"]
-    D --> F["Current synthetic clinical notes"]
-    F --> G["nomic-embed-text via Ollama"]
-    G --> H["ChromaDB vector store"]
+    A["Synthea — synthetic FHIR R4"] --> B["Raw / Bronze JSON Bundles"]
+    B --> C["Python ETL, metadata audit and quality review"]
+    C --> D["Silver: reviewed local CSV"]
+    D --> E["Gold: SQLite relational database"]
+    D --> F["Selected current synthetic notes"]
+    F --> G["nomic-embed-text via local Ollama"]
+    G --> H["ChromaDB index"]
     E --> I["Patient-scoped SQL retrieval"]
-    H --> J["Patient-scoped semantic retrieval"]
+    H --> J["Patient-scoped document retrieval"]
     I --> K["SQL / RAG / hybrid evidence assembly"]
     J --> K
     K --> L["Qwen 3.5 4B via Ollama"]
-    L --> M["Citation-ID guard and evidence fallback"]
+    L --> M["Citation-ID guard and safe fallback"]
     M --> N["Streamlit Clinical Assistant"]
-    E --> O["Streamlit + Plotly Analytics Dashboard"]
-    E --> P["Evidence-linked clinical charts"]
+    E --> O["Streamlit Analytics Dashboard"]
+    E --> P["Contextual charts: history or one value"]
     P --> N
+    B --> Q["Separate PySpark ETL — Ubuntu / WSL 2"]
+    Q --> R["Spark Silver and Gold Parquet"]
+    B --> S["Read-only Phase 20 consistency audit"]
+    R --> S
+    E -. "optional SQLite comparison" .-> S
+    E --> T["Operational analytics / forecasting experiments"]
+    E --> U["Power BI-ready exports"]
 ```
 
-**Data layout:** raw FHIR files (`data/raw`) → transformed CSVs (`data/processed/fhir`) → structurally reviewed Silver data (`data/silver/fhir`) → SQLite Gold database (`data/gold/datahealth.db`). A separate ChromaDB index (`data/vectorstore/chroma`) holds document embeddings. All are **local runtime artifacts** and are excluded from the initial source repository.
+The source diagram is available at [`docs/architecture_overview.mmd`](docs/architecture_overview.mmd). Diagram edges are a high-level explanation; they are **not** evidence of a cloud deployment or a live streaming architecture.
 
-See [architecture overview source](docs/architecture_overview.mmd), [Gold Layer design](docs/gold_layer_design.md), [RAG architecture](docs/rag_architecture.md), and [deployment readiness](docs/deployment_readiness.md).
+**Local data layout:** `data/raw/` (source Bundles) → `data/processed/fhir/` (Python transformed data) → `data/silver/fhir/` (reviewed data) → `data/gold/datahealth.db` (SQLite). The separate Spark workflow writes Silver/Gold Parquet artifacts, documented in [Phase 19](docs/development_history/README_PHASE19_SPARK.md). The ChromaDB index is stored locally under `data/vectorstore/chroma/`. Runtime data and generated reports are excluded from Git.
 
 ## Technology stack
 
-| Layer | Technologies |
+| Component | Technologies / environment |
 |---|---|
-| Source interoperability | **HL7 FHIR R4**, Synthea synthetic patient records, JSON |
-| Engineering and validation | **Python 3.12**, standard-library CSV/JSON tools, metadata audits, `unittest` |
-| Analytics storage | **SQLite** (local relational Gold Layer) |
-| Semantic search | **ChromaDB**, **nomic-embed-text** |
-| Language-model inference | **Qwen 3.5 4B**, **Ollama** (local) |
-| UI and visualization | **Streamlit**, **Plotly**, custom CSS |
-| Source control | **Git**, GitHub |
+| Data source | Synthea, HL7 FHIR R4, JSON |
+| Windows application | Python 3.12, Pandas, NumPy, SQLite, Streamlit, Plotly, Matplotlib |
+| AI and retrieval | Ollama, Qwen 3.5 4B, `nomic-embed-text`, ChromaDB; FastEmbed in selected Cloud Demo/benchmark paths |
+| ML experimentation | Scikit-learn and project-specific forecasting modules |
+| Spark workflow | Ubuntu on WSL 2, PySpark 4.3.0, compatible Java runtime, Parquet |
+| Evaluation and versioning | `unittest`, Git, GitHub |
 
-**Planned, not implemented in this local prototype:** Apache Kafka, Apache Spark, managed Azure/AWS services, Power BI integration, real-time device streams, clinical prediction models, and production-grade access controls.
+**Not implemented as production integrations:** Apache Kafka, live device streaming, hospital APIs, managed Azure/AWS deployment, hosted Power BI Service, and production-grade authentication/authorization. There is **no predictive patient-risk model** in this prototype.
 
-## Experimental data processing results
+## Experimental results — one synthetic dataset
 
-The following figures describe **one local run** on an independently obtained Synthea FHIR sample. They are not guaranteed outputs for a different dataset or generation seed.
+These numbers refer to **one local run**, not guaranteed values for a different Synthea sample or random seed.
 
 | Indicator | Local result |
 |---|---:|
@@ -103,15 +121,15 @@ The following figures describe **one local run** on an independently obtained Sy
 | Encounters | **5,087** |
 | Original FHIR `Observation` resources | **34,024** |
 | Normalized observation-value rows | **51,366** |
-| Observation-value rows flagged for review | **1,529** (about **2.98%**) |
-| Current synthetic documents indexed | **112** |
+| Rows flagged for review | **1,529** (approximately **2.98%**) |
+| Selected current synthetic documents indexed | **112** |
 | ChromaDB text chunks indexed | **198** |
 
-The 1,529 flagged rows reflect **structural/semantic review flags**, not 1,529 proven clinical errors. Source values were retained, and uncertain unit conversions were not automated. Current-document selection does not establish permission to access real medical information.
+Review flags identify **potential structural or semantic issues**, not proven medical errors. Source values are retained; uncertain unit conversions are not applied automatically.
 
-## LLM evaluation: small exploratory study
+## LLM evaluation — small exploratory study
 
-Two experimental runs used the **same six prompts for one synthetic patient**. Five prompts produced answers; one medication-related SQL query had no eligible evidence, so the model was not asked to invent a response.
+Two early experiments used the **same six prompts for one synthetic patient**. Five prompts produced answers; one query had no eligible evidence.
 
 | Metric | Phase 8 baseline | Phase 8.1 citation guard |
 |---|---:|---:|
@@ -121,27 +139,27 @@ Two experimental runs used the **same six prompts for one synthetic patient**. F
 | Provisionally unsupported/unclear claim groups | **6 / 47** | **2 / 47** |
 | Mean total time for generated/validated answers | **6.634 s** | **5.799 s** |
 
-**Interpretation:** exact citation-ID hygiene improved in this matched experiment. These tiny, reviewer-dependent samples **cannot establish a general factual accuracy rate, clinical safety level, calibrated hallucination rate, or performance advantage**. In particular, an existing citation ID does not prove that the referenced evidence supports each sentence.
+These results are **not** a general accuracy estimate, a calibrated hallucination rate, or evidence of clinical safety. For methodology, see [LLM evaluation](docs/llm_evaluation_methodology.md) and [citation policy](docs/reliability_citation_policy.md).
 
-Known review limitations include statements that imply a structured table was checked during a RAG-only query, and ambiguous grouping of vaccine terms from a clinical note. See [evaluation methodology](docs/llm_evaluation_methodology.md) and [citation policy](docs/reliability_citation_policy.md).
+## Run locally
 
-## Run locally (Windows PowerShell)
+The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. The steps below reflect the existing project documentation and **have not yet been validated from a completely clean machine**.
 
-The repository contains **source code and tests**, but **does not ship** the Synthea data, generated SQLite database, Chroma index, or Ollama model files. The procedure below assumes permission to obtain the synthetic sample and enough local disk/memory resources.
+### Windows — application and local AI
 
-### 1. Clone and prepare the Python environment
+Use PowerShell from the repository root with Python **3.12**:
 
 ```powershell
 git clone https://github.com/LucaBarsi/DataHealth-AI.git
 cd DataHealth-AI
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -r requirements_local.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-### 2. Install and prepare local Ollama models
+`requirements.txt` is a **range-based dependency manifest**, not a fully pinned lockfile. The original phase-specific requirements are kept for auditability. A clean install, including optional benchmark paths, is still part of Phase 22 release validation.
 
-Install [Ollama](https://ollama.com/download) on Windows, then run:
+Install and start [Ollama](https://ollama.com/download), then download the required local models:
 
 ```powershell
 ollama pull qwen3.5:4b
@@ -149,13 +167,7 @@ ollama pull nomic-embed-text
 ollama list
 ```
 
-Ollama should be running locally before you build the vector index or ask questions.
-
-### 3. Obtain and transform synthetic FHIR data
-
-Download a compatible **FHIR R4** sample from the [Synthea downloads page](https://synthetichealth.github.io/downloads.html), extract its JSON files to `data/raw/synthea_sample_data_fhir_latest/`, and confirm that the directory contains the synthetic patient bundles. The sample is not included here.
-
-From the project root:
+Obtain a compatible **Synthea FHIR R4 sample** (see [Synthea downloads](https://synthetichealth.github.io/downloads.html)) and place its JSON Bundles in `data/raw/synthea_sample_data_fhir_latest/`. Then create the local Gold Layer:
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.transform_fhir --input "data/raw/synthea_sample_data_fhir_latest" --output "data/processed/fhir"
@@ -163,82 +175,117 @@ From the project root:
 .\.venv\Scripts\python.exe -m src.build_gold --input "data/silver/fhir" --output "data/gold/datahealth.db" --reports "reports/gold"
 ```
 
-These scripts prepare **selected** FHIR resources; they are not a complete FHIR-conformance validator or enterprise ingestion service. If you use a different dataset, expect different counts and metadata findings.
-
-### 4. Create the local document index
+Create the local document index:
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.rag_assistant index --silver "data/silver/fhir" --database "data/gold/datahealth.db" --index-dir "data/vectorstore/chroma" --reports "reports/rag"
 ```
 
-Only eligible current synthetic documents are indexed by default. The index can be rebuilt if source data or the embedding model changes; see [RAG notes](docs/rag_architecture.md).
-
-### 5. Start the application
+Start the local interface:
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run Clinical_Assistant.py --server.address 127.0.0.1
 ```
 
-Open the local URL shown in the terminal (typically `http://127.0.0.1:8501`); then navigate between **Clinical Assistant** and **Analytics Dashboard**. The port can differ if another Streamlit instance is running.
+Use the Streamlit navigation to access **Clinical Assistant**, **Analytics Dashboard**, and **ML Forecasting**. Local model inference requires Ollama to be running. Keep the application on localhost and never load real patient data.
 
-### 6. Run tests and review quality reports
+### Ubuntu / WSL 2 — separate Spark environment
+
+The Spark path is **not** required for launching the Windows Clinical Assistant. The project-specific Spark ETL tests passed on Ubuntu/WSL 2 with PySpark **4.3.0**. Use a **separate Linux virtual environment** and a compatible Java runtime; do not reuse the Windows `.venv`.
+
+From the Ubuntu shell, use the corresponding WSL-mounted path to your own clone:
+
+```bash
+cd /mnt/c/path/to/DataHealth-AI
+source ~/datahealth-spark-venv/bin/activate
+python -m unittest discover -s tests -p 'test_spark_etl.py' -v
+python -m unittest discover -s tests -p 'test_validate_local_pipeline.py' -v
+```
+
+For a **new** Linux virtual environment, install [`requirements-spark.txt`](requirements-spark.txt) after configuring Python and Java. For the actual ETL invocation and Parquet layout, consult [Phase 19](docs/development_history/README_PHASE19_SPARK.md). For read-only pipeline consistency checks, consult [Phase 20](docs/development_history/README_PHASE20_LOCAL_INTEGRATION.md).
+
+### Tests and validation scope
+
+Windows example, from the project root:
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_repository_preflight.py" -v
-.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_reliable_assistant.py" -v
+.\.venv\Scripts\python.exe -m pip check
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_contextual_charts.py" -v
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_analytics_backend.py" -v
 ```
 
-These tests cover selected components and often use synthetic fixtures or mocked model responses. They **do not** establish end-to-end clinical reliability. For generated quality reports, refer to the `reports/` folder in your own local run; this folder is intentionally not published in the repository.
+**Observed recent checks:** 11/11 contextual-chart unit tests passed after the Phase 21 UI revision; 3/3 Spark ETL tests passed on Ubuntu/WSL 2; a Windows `pip check` found no broken installed requirements. Visual checks covered vital-sign and laboratory charts, one-point presentation, and opt-in quality flags. These checks do **not** replace a clean installation, a full cross-environment regression run, or an independent clinical evaluation. A broad Windows test run encountered a native Hadoop compatibility issue in the Spark tests.
 
-## Repository structure
+## Repository layout
 
 ```text
 DataHealth-AI/
-├── Clinical_Assistant.py           # Main Streamlit entry point
+├── Clinical_Assistant.py
+├── app.py
 ├── pages/
-│   └── 1_Analytics_Dashboard.py    # Interactive analytics workspace
-├── src/                            # FHIR ETL, SQL, RAG, evaluation, UI backends
-├── scripts/                        # Repository publication preflight
-├── tests/                          # Automated component tests
-├── sql/                            # Query examples
-├── assets/
-│   ├── datahealth.css
-│   ├── analytics_dashboard.css
-│   └── screenshots/                # This README update
-├── docs/                           # Architecture, mapping, QA and safety notes
-├── requirements_local.txt
+│   ├── 1_Analytics_Dashboard.py
+│   └── 2_ML_Forecasting.py
+├── src/                      # ETL, SQL, AI/retrieval, analytics, forecasting, Spark
+├── cloud_demo/               # Evaluation/benchmarks and optional demo backends
+├── tests/                    # Automated tests
+├── scripts/                  # Project utilities
+├── sql/                      # SQL examples
+├── assets/                   # UI styling and optional screenshots
+├── docs/                     # Detailed architecture, QA, evaluation notes
+├── requirements.txt          # Windows application (Phase 22)
+├── requirements-spark.txt    # Ubuntu/WSL Spark (Phase 22)
+├── requirements_phase*.txt   # Historical dependency manifests
 └── README.md
 ```
 
-## Security, limitations and deployment
+Generated `data/` and `reports/` directories are intentionally excluded from Git. These are **runtime artifacts**, not public datasets shipped with the source repository.
 
-- **Synthetic data only.** Never upload real patient records into this educational demo or commit local clinical data, model files, credentials, `.venv/`, or runtime databases.
-- **Patient-scoped retrieval is not access control.** An internet-facing healthcare application would require identity verification, authorization, secure secrets handling, audit logging, rate limits, and privacy/legal review.
-- **No medical decision support.** The system does not diagnose, prescribe, clinically validate observations, or train a predictive disease model.
-- **Not yet cloud-deployable as-is.** Public hosting requires an accessible, protected inference service, a reproducible synthetic data store, vector persistence, configuration management, and independent testing. See [deployment notes](docs/deployment_readiness.md).
-- **Licensing:** no project license has been selected in this source release. Do not assume unrestricted reuse rights; check the licenses of dependencies and source data separately.
+## Technical documentation
+
+| Topic | Reference |
+|---|---|
+| Current architecture source | [Architecture overview](docs/architecture_overview.mmd) |
+| Relational Gold Layer | [Gold Layer design](docs/gold_layer_design.md) |
+| RAG implementation | [RAG architecture](docs/rag_architecture.md) |
+| ML forecasting | [Phase 18](docs/development_history/README_PHASE18.md) and [methodology](docs/phase18_workload_forecasting.md) |
+| Local Spark Parquet workflow | [Phase 19](docs/development_history/README_PHASE19_SPARK.md) |
+| Cross-pipeline consistency | [Phase 20](docs/development_history/README_PHASE20_LOCAL_INTEGRATION.md) |
+| Evidence-linked charts | [Phase 21 validation](docs/development_history/PHASE21_CONTEXTUAL_CHARTS_VALIDATION.md) |
+| Downstream Power BI preparation | [Power BI guide](docs/development_history/README_POWER_BI.md) |
+| Security and deployment | [Deployment readiness](docs/deployment_readiness.md) |
+
+Earlier `README_PHASE*.md` documents remain in the repository as a development history. Documentation files must be staged, link-checked, and reviewed before publication; Git currently has local untracked content from recent phases.
+
+## Security, limitations, and release readiness
+
+- **Synthetic data only.** Do not include real patient information, secret tokens, `.env`, local database/index files, reports, or generated datasets in the Git repository.
+- **Not patient authentication.** Selecting a patient ID and scoping retrieval in a local demo are **not** substitutes for authorization, identity verification, auditing, privacy controls, or secure internet-facing deployment.
+- **Citation and quality caveats.** Citation IDs indicate reference identity, not support for every generated claim; structural checks do not establish clinical correctness.
+- **No hosted app.** The local Ollama + SQLite + ChromaDB configuration is not an internet-ready deployment. Managed cloud infrastructure and live streaming remain future work.
+- **Reproducibility incomplete.** Phase 22 still needs link verification, clean install tests, a consolidated release check, and explicit review of Git changes before publishing.
+- **License:** no project software license has yet been selected; review code, data, and dependency licenses before claiming unrestricted reuse rights.
 
 ## Roadmap
 
-- [x] FHIR-derived Bronze/Silver/Gold-inspired local pipeline
-- [x] Structural quality flags and patient-linked SQL retrieval
-- [x] Local Qwen + ChromaDB RAG and citation-ID validation
-- [x] Streamlit Clinical Assistant, analytics dashboard, and contextual charts
-- [x] Initial unit tests and small manually reviewed LLM evaluation
-- [ ] Broader multi-patient evaluation, claim-level citation checks and terminology cleanup
-- [ ] Fully reproducible public synthetic demo dataset and automated CI checks
-- [ ] Protected hosted inference + database/vector services for a public demonstration
-- [ ] Streaming ingestion with Kafka and scalable processing with Spark
-- [ ] Azure/AWS architecture deployment and Power BI reporting
-- [ ] A clearly scoped predictive ML use case with appropriate labels and evaluation
+- [x] Local FHIR-derived Bronze / Silver / SQLite Gold pipeline
+- [x] Quality flags, patient-scoped SQL and RAG, citation-ID checks
+- [x] Clinical Assistant, Analytics Dashboard, contextual charts (Phase 21)
+- [x] Local Spark/Parquet path and integration-audit implementation (Phases 19–20)
+- [x] Operational forecasting prototype and Power BI-ready export tooling
+- [x] Separate Windows / WSL requirements manifests (Phase 22, initial draft)
+- [ ] Clean installation and cross-environment regression validation
+- [ ] Reconcile and organize all README files, links, and screenshots
+- [ ] Broader multi-patient, claim-level AI evaluation
+- [ ] Protected public demo deployment, if pursued
+- [ ] Kafka streaming and managed Azure/AWS architecture, if pursued
+- [ ] Production-grade access controls and legal/security review for any real-world use
 
 ## Acknowledgments
 
 - [Synthea](https://github.com/synthetichealth/synthea) — synthetic health-record generation.
 - [HL7 FHIR R4](https://hl7.org/fhir/R4/) — healthcare interoperability specification.
-- [Ollama](https://ollama.com/), [ChromaDB](https://www.trychroma.com/), [Streamlit](https://streamlit.io/) and [Plotly](https://plotly.com/) — model runtime, retrieval and UI tooling.
+- [Ollama](https://ollama.com/), [ChromaDB](https://www.trychroma.com/), [Streamlit](https://streamlit.io/), [Plotly](https://plotly.com/), and [Apache Spark](https://spark.apache.org/) — major components of the local experimentation stack.
 
 ---
 
-**Project repository:** [DataHealth-AI](https://github.com/LucaBarsi/DataHealth-AI) · **Current scope:** local educational prototype, synthetic records only.
+**Project repository:** [DataHealth-AI](https://github.com/LucaBarsi/DataHealth-AI) · **Scope:** local educational prototype using synthetic records only.

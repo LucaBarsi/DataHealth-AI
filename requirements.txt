@@ -1,0 +1,14 @@
+# DataHealth AI — local application dependencies (Phase 22)
+# Target environment: Windows, Python 3.12, isolated virtual environment.
+# Consolidated from requirements_local.txt and prior phase-specific files.
+# Version bounds preserve the existing declared requirements; this is not a lockfile.
+# Ollama, Qwen, Synthea datasets, and local SQLite/ChromaDB data are not installed by pip.
+
+numpy>=1.26,<3
+pandas>=2.2,<4
+scikit-learn>=1.4,<2
+matplotlib>=3.8,<4
+plotly>=5.24,<7
+streamlit>=1.45,<2
+chromadb>=1.4,<2
+fastembed>=0.9,<1

@@ -55,7 +55,7 @@ The script refuses to overwrite an existing nonempty output directory. Use a new
 
 ## 5. Review the factual statements
 
-Fill `manual_review.csv` with evidence-grounded scores, using the [evaluation methodology](docs/llm_evaluation_methodology.md). Example labels:
+Fill `manual_review.csv` with evidence-grounded scores, using the [evaluation methodology](../llm_evaluation_methodology.md). Example labels:
 
 - `factual_accuracy`: `correct` / `partial` / `incorrect`
 - `citation_support`: `supported` / `partial` / `unsupported`

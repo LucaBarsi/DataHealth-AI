@@ -1,0 +1,7 @@
+# DataHealth AI — Spark ETL dependencies (Phase 22)
+# Target environment: Ubuntu on WSL 2; use a SEPARATE Linux virtual environment.
+# PySpark 4.3.0 passed the project-specific Spark ETL tests in that environment.
+# A compatible Java runtime is needed separately; pip does not install Java.
+# Install this file in the Linux Spark environment, not the Windows application .venv.
+
+pyspark==4.3.0

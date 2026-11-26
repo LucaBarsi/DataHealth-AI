@@ -1,0 +1,230 @@
+{
+  "synthetic_only": true,
+  "annotation_policy": "One target fictional note per query; labels hand-authored for retrieval evaluation only.",
+  "queries": [
+    {
+      "query_id": "Q001",
+      "patient_id": "DEMO-P001",
+      "question": "Which document explains that the office arranged another visit?",
+      "relevant_document_ids": [
+        "DEMO-D101"
+      ]
+    },
+    {
+      "query_id": "Q002",
+      "patient_id": "DEMO-P001",
+      "question": "Where did staff reconcile the drug list against intake paperwork?",
+      "relevant_document_ids": [
+        "DEMO-D102"
+      ]
+    },
+    {
+      "query_id": "Q003",
+      "patient_id": "DEMO-P001",
+      "question": "Which record discusses labeling a specimen before chemistry processing?",
+      "relevant_document_ids": [
+        "DEMO-D103"
+      ]
+    },
+    {
+      "query_id": "Q004",
+      "patient_id": "DEMO-P001",
+      "question": "Which document explains the completeness review of sensitivity information?",
+      "relevant_document_ids": [
+        "DEMO-D104"
+      ]
+    },
+    {
+      "query_id": "Q005",
+      "patient_id": "DEMO-P001",
+      "question": "Which note describes updating the shot history checklist?",
+      "relevant_document_ids": [
+        "DEMO-D105"
+      ]
+    },
+    {
+      "query_id": "Q006",
+      "patient_id": "DEMO-P001",
+      "question": "Which note mentions checking the pressure cuff calibration label?",
+      "relevant_document_ids": [
+        "DEMO-D106"
+      ]
+    },
+    {
+      "query_id": "Q007",
+      "patient_id": "DEMO-P001",
+      "question": "Which document discusses access to online patient messages?",
+      "relevant_document_ids": [
+        "DEMO-D107"
+      ]
+    },
+    {
+      "query_id": "Q008",
+      "patient_id": "DEMO-P002",
+      "question": "Where was matching the collection sticker to the specimen ID documented?",
+      "relevant_document_ids": [
+        "DEMO-D201"
+      ]
+    },
+    {
+      "query_id": "Q009",
+      "patient_id": "DEMO-P002",
+      "question": "Which note covers forwarding exit paperwork to administration?",
+      "relevant_document_ids": [
+        "DEMO-D202"
+      ]
+    },
+    {
+      "query_id": "Q010",
+      "patient_id": "DEMO-P002",
+      "question": "Which record says a return visit was booked after a phone reminder?",
+      "relevant_document_ids": [
+        "DEMO-D203"
+      ]
+    },
+    {
+      "query_id": "Q011",
+      "patient_id": "DEMO-P002",
+      "question": "Which document talks about reviewing chemical instrument QC records?",
+      "relevant_document_ids": [
+        "DEMO-D204"
+      ]
+    },
+    {
+      "query_id": "Q012",
+      "patient_id": "DEMO-P002",
+      "question": "Where did staff check a drug request form for blank fields?",
+      "relevant_document_ids": [
+        "DEMO-D205"
+      ]
+    },
+    {
+      "query_id": "Q013",
+      "patient_id": "DEMO-P002",
+      "question": "Which note describes checking registration details against intake information?",
+      "relevant_document_ids": [
+        "DEMO-D206"
+      ]
+    },
+    {
+      "query_id": "Q014",
+      "patient_id": "DEMO-P002",
+      "question": "Which document discusses booking a scan and checking its tracking number?",
+      "relevant_document_ids": [
+        "DEMO-D207"
+      ]
+    },
+    {
+      "query_id": "Q015",
+      "patient_id": "DEMO-P003",
+      "question": "Which record describes inspecting the pulse monitor battery and cleaning?",
+      "relevant_document_ids": [
+        "DEMO-D301"
+      ]
+    },
+    {
+      "query_id": "Q016",
+      "patient_id": "DEMO-P003",
+      "question": "Which note addresses absent time stamps and repeated labels in the chart?",
+      "relevant_document_ids": [
+        "DEMO-D302"
+      ]
+    },
+    {
+      "query_id": "Q017",
+      "patient_id": "DEMO-P003",
+      "question": "Where were signature boxes on the permission paperwork reviewed?",
+      "relevant_document_ids": [
+        "DEMO-D303"
+      ]
+    },
+    {
+      "query_id": "Q018",
+      "patient_id": "DEMO-P003",
+      "question": "Which document focuses on units printed beside test results?",
+      "relevant_document_ids": [
+        "DEMO-D304"
+      ]
+    },
+    {
+      "query_id": "Q019",
+      "patient_id": "DEMO-P003",
+      "question": "Which record explains shifting a cancelled visit to another date?",
+      "relevant_document_ids": [
+        "DEMO-D305"
+      ]
+    },
+    {
+      "query_id": "Q020",
+      "patient_id": "DEMO-P003",
+      "question": "Which note covers checking expiry labels in the pharmacy inventory?",
+      "relevant_document_ids": [
+        "DEMO-D306"
+      ]
+    },
+    {
+      "query_id": "Q021",
+      "patient_id": "DEMO-P003",
+      "question": "Where was the preferred reminder channel inspected?",
+      "relevant_document_ids": [
+        "DEMO-D307"
+      ]
+    },
+    {
+      "query_id": "Q022",
+      "patient_id": "DEMO-P004",
+      "question": "Which document concerns the cold storage temperature sheet for injections?",
+      "relevant_document_ids": [
+        "DEMO-D401"
+      ]
+    },
+    {
+      "query_id": "Q023",
+      "patient_id": "DEMO-P004",
+      "question": "Where was a narrative assigned search tags and a document category?",
+      "relevant_document_ids": [
+        "DEMO-D402"
+      ]
+    },
+    {
+      "query_id": "Q024",
+      "patient_id": "DEMO-P004",
+      "question": "Which record says a specialist request form went to the booking inbox?",
+      "relevant_document_ids": [
+        "DEMO-D403"
+      ]
+    },
+    {
+      "query_id": "Q025",
+      "patient_id": "DEMO-P004",
+      "question": "Which note documents checking the transport sheet at specimen pickup?",
+      "relevant_document_ids": [
+        "DEMO-D404"
+      ]
+    },
+    {
+      "query_id": "Q026",
+      "patient_id": "DEMO-P004",
+      "question": "Which document explains verifying that patient records were isolated by permissions?",
+      "relevant_document_ids": [
+        "DEMO-D405"
+      ]
+    },
+    {
+      "query_id": "Q027",
+      "patient_id": "DEMO-P004",
+      "question": "Where were prior drug entries compared with a reconciliation checklist?",
+      "relevant_document_ids": [
+        "DEMO-D406"
+      ]
+    },
+    {
+      "query_id": "Q028",
+      "patient_id": "DEMO-P004",
+      "question": "Which note discusses checking the heart tracing machine cable?",
+      "relevant_document_ids": [
+        "DEMO-D407"
+      ]
+    }
+  ]
+}

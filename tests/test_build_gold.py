@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -58,7 +59,9 @@ class TestGoldLayer(unittest.TestCase):
         self.assertEqual(len(run_query(self.db, "list-patients")), 1)
         results = run_query(self.db, "latest-observations", "synthetic-1")
         self.assertEqual(sorted(r["value_numeric"] for r in results), [82.0, 122.0])
-        with sqlite3.connect(self.db) as conn:
+        # A SQLite context manager commits/rolls back but does not close the handle.
+        # Explicitly close it before TemporaryDirectory cleanup (required on Windows).
+        with closing(sqlite3.connect(self.db)) as conn:
             n = conn.execute("SELECT COUNT(*) FROM v_rag_preliminary_document_metadata").fetchone()[0]
             self.assertEqual(n, 1)
 

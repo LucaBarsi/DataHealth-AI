@@ -51,3 +51,6 @@ service-account.json
 .ipynb_checkpoints/
 .DS_Store
 Thumbs.db
+
+# Local cloud-demo credentials
+/cloud_demo/secrets.toml
