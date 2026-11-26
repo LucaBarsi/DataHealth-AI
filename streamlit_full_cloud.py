@@ -125,14 +125,14 @@ def initialize_assets(token: str) -> bool:
 
 def launch() -> None:
     try:
-        try:
-            token = str(st.secrets.get("HF_TOKEN", "")).strip()
-        except (KeyError, FileNotFoundError):
+        # On local preflight, use validated existing assets without reading
+        # Streamlit Secrets, which may not exist on the developer machine.
+        if DATABASE.is_file() and CHROMA_DIR.is_dir():
             token = ""
-        # Existing local assets can be verified without a Hugging Face token.
-        # The hosted app still requires HF_TOKEN when it must download them.
-        if not token and not (DATABASE.is_file() and CHROMA_DIR.is_dir()):
-            raise RuntimeError("HF_TOKEN is not configured in Streamlit Secrets")
+        else:
+            token = str(st.secrets.get("HF_TOKEN", "")).strip()
+            if not token:
+                raise RuntimeError("HF_TOKEN is not configured in Streamlit Secrets")
         initialize_assets(token)
     except Exception as exc:
         st.set_page_config(page_title="DataHealth AI — Setup", layout="centered")
