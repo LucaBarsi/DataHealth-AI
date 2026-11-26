@@ -3,13 +3,13 @@
 **Phase:** 22 — Architecture & Release Readiness Review
 **Report prepared:** 2026-11-26
 **Scope:** Local educational proof of concept using synthetic clinical data
-**Release state:** Validation evidence collected; Git commit and remote publication **pending**
+**Release state:** Phase 22 source release committed and pushed to the **private** GitHub `main` branch on 2026-11-26 (commit [`04331db`](https://github.com/LucaBarsi/DataHealth-AI/commit/04331db24dc732c345d2e5ae5777873f88ed025f)); **not** a public hosted application.
 
 ## 1. Executive summary
 
 Phase 22 consolidated dependency documentation, reviewed the repository's publication hygiene, reorganized historical documentation, and re-ran automated tests in the project's Windows and Ubuntu/WSL environments. A read-only integration audit reported all 12 internal consistency checks as passed. The clean Windows Python environment passed dependency, import, and selected functional checks.
 
-These results support a **local, synthetic-data release candidate**, subject to the remaining pre-publication checks described below. They do **not** establish clinical safety, full FHIR conformance, production security, or successful deployment in Azure/AWS or as a hosted application.
+These results support a **documented local, synthetic-data source release**. Remaining public-portfolio and clean-machine checks are tracked below. They do **not** establish clinical safety, full FHIR conformance, production security, or successful deployment in Azure/AWS or as a hosted application.
 
 ## 2. Architecture and runtime inventory
 
@@ -80,7 +80,7 @@ Observed during the local, pre-commit review:
 - A filename-based staged-file scan found no matching sensitive paths, and a local size check found no candidate files of 10 MB or more.
 - `git diff --cached --check` returned without whitespace errors at the time of review.
 
-**Limitations:** Filename and keyword matching do not constitute exhaustive secret scanning. Repository history has not been proven free of secrets, and staging content must be inspected again before publication. No remote GitHub push has been independently verified in this phase.
+**Limitations:** Filename and keyword matching do not constitute exhaustive secret scanning, and the repository's full Git history has not been proven free of secrets. The Phase 22 commit and private remote publication were subsequently confirmed by reading GitHub repository metadata and commit `04331db`; no public release or hosted deployment is claimed.
 
 ## 6. Known limitations and boundaries
 
@@ -91,20 +91,26 @@ Observed during the local, pre-commit review:
 5. **Spark is validated on WSL 2.** Native Windows Spark was intentionally excluded due to prior native Hadoop compatibility issues.
 6. **Cloud/streaming roadmap is separate.** Azure/AWS managed deployment and Kafka ingestion must not be described as completed features without new evidence.
 
-## 7. Final release gate — remaining actions
+## 7. Source publication verification and remaining follow-up
 
-The items below remain **pending** before considering Phase 22 published:
+Completed for the Phase 22 **private source release**:
 
-- [ ] Inspect the final staged diff and check for real credentials or unexpected content, including historical Git exposure where relevant.
-- [ ] Re-run `git diff --cached --check` after any final edits.
-- [ ] Verify `README.md`, `docs/README.md`, and supporting media after staging; check the double-extension image name `docs/images/power_bi_healthcare_operations.png.png` and references before renaming.
-- [ ] Confirm the modified `.gitignore` is staged, and verify the actual credential file remains ignored and untracked.
-- [ ] Stage this report after reviewing it, preferably in the project's documentation directory.
-- [ ] Create a descriptive Git commit, then check `git status --short`.
-- [ ] Push to the intended remote branch only after review and independently verify the GitHub repository view.
+- [x] Reviewed candidate file names and common credential patterns; these checks were not an exhaustive secret scan.
+- [x] Re-ran `git diff --cached --check` with no whitespace errors before commit.
+- [x] Confirmed the `/cloud_demo/secrets.toml` ignore rule and that the file was not Git-tracked.
+- [x] Included this report and the consolidated documentation in commit `04331db`.
+- [x] Confirmed a clean local working tree immediately after the commit and push.
+- [x] Pushed commit `04331db` to `origin/main` and verified it through the connected GitHub repository.
 
-## 8. Suggested release designation
+Still recommended before a **public portfolio release**:
 
-**Phase 22 — Local Release Candidate (RC)** until the final staged-content review and remote verification are complete.
+- [ ] Review the Git history with a dedicated secret scanner and assess any historical exposure.
+- [ ] Review README screenshots against the current UI; check the double-extension image name `docs/images/power_bi_healthcare_operations.png.png` and its references before renaming.
+- [ ] Validate end-to-end startup from a fresh machine with all synthetic data, Ollama models, and optional benchmark prerequisites.
+- [ ] Decide whether to change repository visibility from private to public, after the review above.
+
+## 8. Release designation
+
+**Phase 22 — Private GitHub source release of a validated local educational prototype.** It is not a publicly deployed application or a clinically validated system.
 
 The report records results supplied during Phase 22 development sessions; it is not a CI-generated attestation or independent third-party audit.
