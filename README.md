@@ -7,7 +7,7 @@
 > [!IMPORTANT]
 > **Synthetic data only.** This is a research and portfolio project, **not** a clinical decision-support system. Do not use it to diagnose, treat, monitor, or make decisions about real people. Passing structural checks and finding valid citation IDs do **not** establish clinical correctness.
 
-**Project status (Phase 22 review):** functional **local** prototype with a separate Ubuntu/WSL Spark workflow; documentation and release-readiness work is ongoing. The source repository may not yet include the latest uncommitted changes. **No public web deployment** is claimed.
+**Project status (Phase 22 completed, 2026-11-26):** functional **local** prototype with a separate Ubuntu/WSL Spark workflow. Phase 22 documentation and validation were committed and pushed to the **private** GitHub `main` branch (commit [`04331db`](https://github.com/LucaBarsi/DataHealth-AI/commit/04331db24dc732c345d2e5ae5777873f88ed025f)). **No public web deployment** is claimed.
 
 ## Why this project exists
 
@@ -143,7 +143,7 @@ These results are **not** a general accuracy estimate, a calibrated hallucinatio
 
 ## Run locally
 
-The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. The steps below reflect the existing project documentation and **have not yet been validated from a completely clean machine**.
+The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
 
 ### Windows — application and local AI
 
@@ -157,7 +157,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-`requirements.txt` is a **range-based dependency manifest**, not a fully pinned lockfile. The original phase-specific requirements are kept for auditability. A clean install, including optional benchmark paths, is still part of Phase 22 release validation.
+`requirements.txt` is a **range-based dependency manifest**, not a fully pinned lockfile. The original phase-specific requirements are kept for auditability. Installation and selected tests passed in a fresh Windows virtual environment; optional benchmark dependencies and full end-to-end reproducibility have not been independently certified.
 
 Install and start [Ollama](https://ollama.com/download), then download the required local models:
 
@@ -214,7 +214,7 @@ Windows example, from the project root:
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_analytics_backend.py" -v
 ```
 
-**Observed recent checks:** 11/11 contextual-chart unit tests passed after the Phase 21 UI revision; 3/3 Spark ETL tests passed on Ubuntu/WSL 2; a Windows `pip check` found no broken installed requirements. Visual checks covered vital-sign and laboratory charts, one-point presentation, and opt-in quality flags. These checks do **not** replace a clean installation, a full cross-environment regression run, or an independent clinical evaluation. A broad Windows test run encountered a native Hadoop compatibility issue in the Spark tests.
+**Phase 22 validation:** 268 non-Spark tests passed in the project Windows environment; 3/3 Spark ETL and 6/6 local integration helper tests passed on Ubuntu/WSL 2; and the read-only pipeline audit reported **12/12** internal consistency checks passed. A separate Windows Python 3.12.10 virtual environment passed `pip check`, 8/8 library imports, and 17/17 selected functional tests. Spark tests were deliberately run on WSL rather than native Windows because of earlier native Hadoop compatibility issues. These results do **not** establish full end-to-end clean-machine reproducibility or independent clinical validation. See the [Phase 22 validation report](PHASE22_FINAL_VALIDATION.md).
 
 ## Repository layout
 
@@ -254,7 +254,7 @@ Generated `data/` and `reports/` directories are intentionally excluded from Git
 | Downstream Power BI preparation | [Power BI guide](docs/development_history/README_POWER_BI.md) |
 | Security and deployment | [Deployment readiness](docs/deployment_readiness.md) |
 
-Earlier `README_PHASE*.md` documents remain in the repository as a development history. Documentation files must be staged, link-checked, and reviewed before publication; Git currently has local untracked content from recent phases.
+Historical `README_PHASE*.md` documents are now organized under [`docs/development_history/`](docs/development_history/). Local Markdown links were updated and checked during Phase 22; the source changes were committed and pushed to the private GitHub `main` branch.
 
 ## Security, limitations, and release readiness
 
@@ -262,7 +262,7 @@ Earlier `README_PHASE*.md` documents remain in the repository as a development h
 - **Not patient authentication.** Selecting a patient ID and scoping retrieval in a local demo are **not** substitutes for authorization, identity verification, auditing, privacy controls, or secure internet-facing deployment.
 - **Citation and quality caveats.** Citation IDs indicate reference identity, not support for every generated claim; structural checks do not establish clinical correctness.
 - **No hosted app.** The local Ollama + SQLite + ChromaDB configuration is not an internet-ready deployment. Managed cloud infrastructure and live streaming remain future work.
-- **Reproducibility incomplete.** Phase 22 still needs link verification, clean install tests, a consolidated release check, and explicit review of Git changes before publishing.
+- **Reproducibility partially validated.** Phase 22 completed local Markdown link checks, Windows/WSL regression testing, pipeline consistency auditing, clean-environment dependency/import checks, and selected functional tests. Complete application setup with external data and model prerequisites on a new machine remains unverified.
 - **License:** no project software license has yet been selected; review code, data, and dependency licenses before claiming unrestricted reuse rights.
 
 ## Roadmap
@@ -272,9 +272,11 @@ Earlier `README_PHASE*.md` documents remain in the repository as a development h
 - [x] Clinical Assistant, Analytics Dashboard, contextual charts (Phase 21)
 - [x] Local Spark/Parquet path and integration-audit implementation (Phases 19–20)
 - [x] Operational forecasting prototype and Power BI-ready export tooling
-- [x] Separate Windows / WSL requirements manifests (Phase 22, initial draft)
-- [ ] Clean installation and cross-environment regression validation
-- [ ] Reconcile and organize all README files, links, and screenshots
+- [x] Separate Windows / WSL requirements manifests (Phase 22)
+- [x] Windows/WSL regression and clean Windows environment dependency/import/selected functional tests
+- [x] Historical README migration and local Markdown link checks
+- [ ] Full clean-machine application setup with all external data/model prerequisites
+- [ ] Review screenshots against the current UI and check outstanding media naming issues
 - [ ] Broader multi-patient, claim-level AI evaluation
 - [ ] Protected public demo deployment, if pursued
 - [ ] Kafka streaming and managed Azure/AWS architecture, if pursued
