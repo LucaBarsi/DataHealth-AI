@@ -126,7 +126,9 @@ def initialize_assets(token: str) -> bool:
 def launch() -> None:
     try:
         token = str(st.secrets.get("HF_TOKEN", "")).strip()
-        if not token:
+        # Existing local assets can be verified without a Hugging Face token.
+        # The hosted app still requires HF_TOKEN when it must download them.
+        if not token and not (DATABASE.is_file() and CHROMA_DIR.is_dir()):
             raise RuntimeError("HF_TOKEN is not configured in Streamlit Secrets")
         initialize_assets(token)
     except Exception as exc:
