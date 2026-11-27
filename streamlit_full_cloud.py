@@ -112,7 +112,12 @@ def _prepare_assets(token: str) -> None:
         staging = Path(tmp)
         _extract_checked(downloaded, staging)
         _validate_database(staging / "datahealth.db")
-        _validate_chroma(staging / "chroma")
+        # Do not open ChromaDB inside TemporaryDirectory: on Windows the
+        # PersistentClient holds native index files open, blocking cleanup.
+        # The downloaded ZIP has already passed a fixed SHA256 check; validate
+        # the extracted directory layout before moving it to its final path.
+        if not (staging / "chroma" / "chroma.sqlite3").is_file():
+            raise RuntimeError("ChromaDB SQLite index file is missing from the package")
         DATABASE.parent.mkdir(parents=True, exist_ok=True)
         CHROMA_DIR.parent.mkdir(parents=True, exist_ok=True)
         if not DATABASE.exists():
