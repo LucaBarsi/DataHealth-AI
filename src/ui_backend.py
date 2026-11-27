@@ -60,6 +60,7 @@ def ask_synthetic_patient(
     max_retries: int = 1,
     answer_generator: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
     allow_rag: bool = True,
+    query_embedder: Callable[[str], list[float]] | None = None,
 ) -> dict[str, Any]:
     """Retrieve scoped evidence and return citation-guarded generation."""
     if not question or not question.strip():
@@ -86,6 +87,7 @@ def ask_synthetic_patient(
     evidence = hybrid_assistant.retrieve_hybrid(
         Path(database), Path(index_dir), patient_id, question.strip(),
         mode=mode, topic=topic, sql_limit=sql_limit, top_k=top_k,
+        query_embedder=query_embedder,
     )
     if evidence.get("patient", {}).get("patient_id") != patient_id:
         raise RuntimeError("Patient scope mismatch: response was blocked")
