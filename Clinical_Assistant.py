@@ -18,6 +18,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src import contextual_charts, hybrid_assistant, ui_backend
+from src import patient_display_guard
 
 # Deployment wrapper opts into hosted SQL inference; direct local startup stays on Ollama.
 HOSTED_SQL_MODE = os.environ.get("DATAHEALTH_HOSTED_SQL") == "1"
@@ -320,8 +321,9 @@ with st.sidebar:
         st.rerun()
     st.markdown(
         '<div class="dh-sidebar-footer">'
-        '<span class="dh-status-dot"></span> LOCAL DEMO<br>'
-        'Synthetic data only. No real clinical use.'
+        '<span class="dh-status-dot"></span> '
+        + ('CLOUD APPLICATION' if HOSTED_SQL_MODE else 'LOCAL RESEARCH DEMO')
+        + '<br>Synthetic data only. No real clinical use.'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -398,7 +400,11 @@ for offset in range(0, len(visible_suggestions), 3):
                 quick_prompt = prompt
 st.caption("Tip: Use AUTO mode to let the application select SQL, RAG, or both. Results are synthetic and not clinical advice.")
 
-for message_index, message in enumerate(st.session_state["chat_messages"]):
+for message_index, message in enumerate(
+    patient_display_guard.visible_messages_for_patient(
+        st.session_state["chat_messages"], selected_patient_id
+    )
+):
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         if message["role"] == "assistant" and message.get("result"):
@@ -409,7 +415,9 @@ st.markdown('<div class="dh-chat-anchor"></div>', unsafe_allow_html=True)
 typed_question = st.chat_input("Ask about the selected synthetic patient…", max_chars=1500)
 question = typed_question or quick_prompt
 if question:
-    st.session_state["chat_messages"].append({"role": "user", "content": question})
+    st.session_state["chat_messages"].append({
+        "role": "user", "content": question, "patient_id": selected_patient_id
+    })
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant"):
@@ -432,6 +440,18 @@ if question:
                 st.error(f"Unable to complete this request: {exc}")
             else:
                 answer = result["response"]["answer"]
+                if HOSTED_SQL_MODE and patient_display_guard.mentions_other_patient(
+                    answer, selected_patient_id, patients
+                ):
+                    # A valid citation ID does not mean an answer refers to the
+                    # correct person; block a known cross-patient name.
+                    result["response"] = {
+                        **result["response"],
+                        "status": "PATIENT_NAME_MISMATCH_BLOCKED",
+                        "reason": "PATIENT_NAME_MISMATCH_BLOCKED",
+                        "answer": "The generated response mentioned a different synthetic patient and was withheld. Select another question or inspect the retrieved source IDs.",
+                    }
+                    answer = result["response"]["answer"]
                 st.markdown(answer)
                 st.caption(
                     f"Citation guard: {result['response']['status']} · "
@@ -444,7 +464,8 @@ if question:
                 evidence_panel(result)
                 contextual_chart_panel(result, selected_patient_id, key=f"new_{len(st.session_state['chat_messages'])}")
                 st.session_state["chat_messages"].append({
-                    "role": "assistant", "content": answer, "result": result,
+                    "role": "assistant", "content": answer,
+                    "result": result, "patient_id": selected_patient_id,
                 })
 
 st.markdown(
