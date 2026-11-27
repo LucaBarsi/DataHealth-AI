@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from html import escape
 from pathlib import Path
+import os
 import sqlite3
 
 import plotly.graph_objects as go
@@ -17,6 +18,37 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src import contextual_charts, hybrid_assistant, ui_backend
+
+# Deployment wrapper opts into hosted SQL inference; direct local startup stays on Ollama.
+HOSTED_SQL_MODE = os.environ.get("DATAHEALTH_HOSTED_SQL") == "1"
+
+
+def hosted_answer_generator():
+    """Create a guarded hosted generator without disclosing secret values."""
+    from cloud_demo.usage_controls import SharedProcessBudget
+    from src.hosted_qwen import HostedQwenSettings, generate_guarded_hosted_answer
+
+    @st.cache_resource(show_spinner=False)
+    def hosted_call_budget():
+        return SharedProcessBudget(max_calls=24, window_seconds=3600)
+
+    try:
+        api_key = str(st.secrets.get("QWEN_API_KEY", "")).strip()
+        api_base = str(st.secrets.get("QWEN_API_BASE_URL", "https://mixlayer.ai/v1")).strip()
+        model_id = str(st.secrets.get("QWEN_MODEL_ID", "qwen/qwen3.5-4b-free")).strip()
+    except (KeyError, FileNotFoundError):
+        api_key, api_base, model_id = "", "https://mixlayer.ai/v1", "qwen/qwen3.5-4b-free"
+    settings = HostedQwenSettings(api_key=api_key, api_base=api_base, model_id=model_id)
+
+    def generate(evidence: dict) -> dict:
+        return generate_guarded_hosted_answer(
+            evidence,
+            settings=settings,
+            session_state=st.session_state,
+            shared_budget=hosted_call_budget(),
+        )
+
+    return generate
 
 st.set_page_config(
     page_title="DataHealth AI | Clinical Intelligence Workspace",
@@ -250,7 +282,13 @@ with st.sidebar:
     )
     st.caption(f"Patient ID: `{selected_patient_id}`")
     st.markdown('<div class="dh-sidebar-section">RETRIEVAL SETTINGS</div>', unsafe_allow_html=True)
-    mode = st.selectbox("Retrieval mode", options=list(hybrid_assistant.MODES), index=0)
+    mode = st.selectbox(
+        "Retrieval mode",
+        options=["sql"] if HOSTED_SQL_MODE else list(hybrid_assistant.MODES),
+        index=0,
+    )
+    if HOSTED_SQL_MODE:
+        st.caption("Hosted SQL preview only; semantic RAG is not enabled without compatible embeddings.")
     topic_value = st.selectbox(
         "SQL topic", options=["Auto", *hybrid_assistant.SQL_TOPICS], index=0,
         disabled=(mode == "rag"),
@@ -298,7 +336,7 @@ st.subheader(selected_name)
 col1, col2, col3 = st.columns(3)
 col1.metric("Synthetic patient records", len(patients))
 col2.metric("Retrieval mode", mode.upper())
-col3.metric("Local language model", "Qwen 3.5 4B")
+col3.metric("Inference", "Hosted Qwen SQL preview" if HOSTED_SQL_MODE else "Local Qwen 3.5 4B")
 
 st.markdown('<div class="dh-section-title">Ask a clinical data question</div>', unsafe_allow_html=True)
 st.caption(
@@ -367,6 +405,8 @@ if question:
                     topic=topic,
                     sql_limit=sql_limit,
                     top_k=top_k,
+                    answer_generator=hosted_answer_generator() if HOSTED_SQL_MODE else None,
+                    allow_rag=not HOSTED_SQL_MODE,
                 )
             except (ValueError, FileNotFoundError, RuntimeError, sqlite3.Error, OSError) as exc:
                 st.error(f"Unable to complete this request: {exc}")
@@ -377,6 +417,10 @@ if question:
                     f"Citation guard: {result['response']['status']} · "
                     "Source ID validation does not establish clinical accuracy."
                 )
+                if HOSTED_SQL_MODE:
+                    reason = result["response"].get("reason", "")
+                    if reason and reason != "HOSTED_QWEN":
+                        st.info(f"Hosted inference status: {reason}. Evidence-only output shown.")
                 evidence_panel(result)
                 contextual_chart_panel(result, selected_patient_id, key=f"new_{len(st.session_state['chat_messages'])}")
                 st.session_state["chat_messages"].append({
