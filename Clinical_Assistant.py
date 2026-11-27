@@ -241,7 +241,7 @@ with st.sidebar:
     st.markdown(
         '<div class="dh-sidebar-logo"><div class="dh-logo-mark">DH<span>+</span></div>'
         '<div><div class="dh-sidebar-wordmark">DataHealth <span>AI</span></div>'
-        '<div class="dh-sidebar-caption">LOCAL RESEARCH WORKSPACE</div></div></div>',
+        '<div class="dh-sidebar-caption">' + ('HOSTED SQL TEST' if HOSTED_SQL_MODE else 'LOCAL RESEARCH WORKSPACE') + '</div></div></div>',
         unsafe_allow_html=True,
     )
     st.markdown('<div class="dh-sidebar-section">PATIENT CONTEXT</div>', unsafe_allow_html=True)
@@ -316,7 +316,8 @@ st.markdown(
     '<div class="dh-kicker">DATAHEALTH AI <span> / </span> CLINICAL INTELLIGENCE</div>'
     '<h1>Data that connects.<br><em>Insights you can trace.</em></h1>'
     '<p>Explore synthetic clinical records across structured data and patient notes, '
-    'with source-aware answers powered by local AI.</p>'
+    + ('with citation-guarded hosted Qwen for SQL evidence.</p>' if HOSTED_SQL_MODE
+       else 'with source-aware answers powered by local AI.</p>')
     '<div class="dh-hero-tags"><span>SQL</span><span>RAG</span><span>Qwen 3.5 4B</span>'
     '<span>Patient-scoped retrieval</span></div>'
     '</section>',
@@ -430,7 +431,9 @@ if question:
 st.markdown(
     '<div class="dh-app-footer">'
     'DataHealth AI <span>·</span> Local prototype <span>·</span> '
-    'Not authenticated <span>·</span> Keep on localhost and never use real patient data'
+    ('Not authenticated <span>·</span> Not approved for public deployment'
+     if HOSTED_SQL_MODE else
+     'Not authenticated <span>·</span> Keep on localhost and never use real patient data')
     '</div>',
     unsafe_allow_html=True,
 )
