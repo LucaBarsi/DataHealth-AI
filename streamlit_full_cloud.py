@@ -195,7 +195,9 @@ def launch() -> None:
         st.caption(f"Setup check: {type(exc).__name__}. Review the app's private configuration and logs.")
         st.stop()
 
-    # Keep the local app and its sidebar/multipage structure unchanged.
+    # Hosted preview uses SQL-only retrieval and bounded Mixlayer inference.
+    # Directly launching Clinical_Assistant.py retains the local Ollama path.
+    os.environ["DATAHEALTH_HOSTED_SQL"] = "1"
     runpy.run_path(str(ROOT / "Clinical_Assistant.py"), run_name="__main__")
 
 
