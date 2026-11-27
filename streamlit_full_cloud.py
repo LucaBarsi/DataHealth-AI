@@ -21,6 +21,8 @@ from zipfile import ZipFile
 from huggingface_hub import hf_hub_download
 import streamlit as st
 
+from src.ml_dashboard_data import REQUIRED_FILES, read_report
+
 ROOT = Path(__file__).resolve().parent
 REPO_ID = "barsi-luca97/datahealth-ai-deployment-assets"
 ARCHIVE_NAME = "datahealth-ai-assets.zip"
@@ -29,6 +31,10 @@ DATABASE = ROOT / "data/gold/datahealth.db"
 CHROMA_DIR = ROOT / "data/vectorstore/chroma"
 EXPECTED_COLLECTION = "synthetic_current_clinical_documents"
 MAX_UNPACKED_BYTES = 128 * 1024 * 1024
+REPORT_ARCHIVE = "phase18-reports.zip"
+REPORT_SHA256 = "3428acd1b4e9c3c907f90118ccfd7414f1f4c6134dcd56862f94274135a36464"
+REPORT_DIR = ROOT / "reports/ml/phase18"
+REPORT_MAX_UNPACKED_BYTES = 256 * 1024
 
 
 def _validate_database(path: Path) -> None:
@@ -117,9 +123,52 @@ def _prepare_assets(token: str) -> None:
     _validate_chroma(CHROMA_DIR)
 
 
+def _prepare_reports(token: str) -> None:
+    """Download and validate the four synthetic, aggregate Phase 18 reports."""
+    if REPORT_DIR.is_dir():
+        read_report(REPORT_DIR)
+        return
+    if not token:
+        raise RuntimeError("HF_TOKEN is needed to obtain private Phase 18 reports")
+
+    downloaded = Path(hf_hub_download(
+        repo_id=REPO_ID,
+        filename=REPORT_ARCHIVE,
+        repo_type="dataset",
+        token=token,
+    ))
+    if sha256(downloaded.read_bytes()).hexdigest() != REPORT_SHA256:
+        raise RuntimeError("Phase 18 report checksum mismatch")
+
+    expected = {f"reports/ml/phase18/{name}" for name in REQUIRED_FILES}
+    with ZipFile(downloaded) as archive:
+        members = archive.infolist()
+        if (len(members) != len(expected)
+                or {member.filename for member in members} != expected
+                or sum(member.file_size for member in members) > REPORT_MAX_UNPACKED_BYTES
+                or archive.testzip() is not None):
+            raise RuntimeError("Unexpected or corrupt Phase 18 report package")
+        for member in members:
+            if stat.S_ISLNK((member.external_attr >> 16) & 0xFFFF):
+                raise RuntimeError("Symlinks are not allowed in Phase 18 report package")
+
+        (ROOT / "data").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="datahealth-report-", dir=ROOT / "data") as tmp:
+            temporary_root = Path(tmp)
+            archive.extractall(temporary_root)
+            extracted = temporary_root / "reports/ml/phase18"
+            read_report(extracted)
+            REPORT_DIR.parent.mkdir(parents=True, exist_ok=True)
+            if REPORT_DIR.exists():
+                raise RuntimeError("Phase 18 report directory exists but is incomplete")
+            os.replace(extracted, REPORT_DIR)
+    read_report(REPORT_DIR)
+
+
 @st.cache_resource(show_spinner=False)
 def initialize_assets(token: str) -> bool:
     _prepare_assets(token)
+    _prepare_reports(token)
     return True
 
 
@@ -127,7 +176,8 @@ def launch() -> None:
     try:
         # On local preflight, use validated existing assets without reading
         # Streamlit Secrets, which may not exist on the developer machine.
-        if DATABASE.is_file() and CHROMA_DIR.is_dir():
+        if (DATABASE.is_file() and CHROMA_DIR.is_dir()
+                and REPORT_DIR.is_dir()):
             token = ""
         else:
             token = str(st.secrets.get("HF_TOKEN", "")).strip()
