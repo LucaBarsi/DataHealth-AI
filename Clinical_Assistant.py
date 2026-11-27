@@ -256,7 +256,7 @@ with st.sidebar:
     st.markdown(
         '<div class="dh-sidebar-logo"><div class="dh-logo-mark">DH<span>+</span></div>'
         '<div><div class="dh-sidebar-wordmark">DataHealth <span>AI</span></div>'
-        '<div class="dh-sidebar-caption">' + ('HOSTED SQL TEST' if HOSTED_SQL_MODE else 'LOCAL RESEARCH WORKSPACE') + '</div></div></div>',
+        '<div class="dh-sidebar-caption">' + ('HOSTED AI PREVIEW' if HOSTED_SQL_MODE else 'LOCAL RESEARCH WORKSPACE') + '</div></div></div>',
         unsafe_allow_html=True,
     )
     st.markdown('<div class="dh-sidebar-section">PATIENT CONTEXT</div>', unsafe_allow_html=True)
