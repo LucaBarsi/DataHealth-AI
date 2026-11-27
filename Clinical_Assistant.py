@@ -50,6 +50,21 @@ def hosted_answer_generator():
 
     return generate
 
+
+def hosted_query_embedder():
+    """Create a lazy, cached CPU query encoder for the deployment RAG path."""
+    from src.hosted_embeddings import embed_query, load_cpu_model
+
+    @st.cache_resource(show_spinner=False)
+    def cpu_model():
+        return load_cpu_model()
+
+    def encode(question: str) -> list[float]:
+        return embed_query(question, cpu_model())
+
+    return encode
+
+
 st.set_page_config(
     page_title="DataHealth AI | Clinical Intelligence Workspace",
     page_icon="🧬",
@@ -284,11 +299,14 @@ with st.sidebar:
     st.markdown('<div class="dh-sidebar-section">RETRIEVAL SETTINGS</div>', unsafe_allow_html=True)
     mode = st.selectbox(
         "Retrieval mode",
-        options=["sql"] if HOSTED_SQL_MODE else list(hybrid_assistant.MODES),
+        options=list(hybrid_assistant.MODES),
         index=0,
     )
     if HOSTED_SQL_MODE:
-        st.caption("Hosted SQL preview only; semantic RAG is not enabled without compatible embeddings.")
+        st.caption(
+            "Hosted inference pilot: SQL + patient-scoped RAG using CPU FastEmbed. "
+            "The query vectors are approximate matches to the original Ollama index."
+        )
     topic_value = st.selectbox(
         "SQL topic", options=["Auto", *hybrid_assistant.SQL_TOPICS], index=0,
         disabled=(mode == "rag"),
@@ -316,7 +334,7 @@ st.markdown(
     '<div class="dh-kicker">DATAHEALTH AI <span> / </span> CLINICAL INTELLIGENCE</div>'
     '<h1>Data that connects.<br><em>Insights you can trace.</em></h1>'
     '<p>Explore synthetic clinical records across structured data and patient notes, '
-    + ('with citation-guarded hosted Qwen for SQL evidence.</p>' if HOSTED_SQL_MODE
+    + ('with hosted Qwen and experimental CPU-based RAG retrieval.</p>' if HOSTED_SQL_MODE
        else 'with source-aware answers powered by local AI.</p>')
     + '<div class="dh-hero-tags"><span>SQL</span><span>RAG</span><span>Qwen 3.5 4B</span>'
     '<span>Patient-scoped retrieval</span></div>'
@@ -337,7 +355,7 @@ st.subheader(selected_name)
 col1, col2, col3 = st.columns(3)
 col1.metric("Synthetic patient records", len(patients))
 col2.metric("Retrieval mode", mode.upper())
-col3.metric("Inference", "Hosted Qwen SQL preview" if HOSTED_SQL_MODE else "Local Qwen 3.5 4B")
+col3.metric("Inference", "Hosted Qwen + CPU RAG" if HOSTED_SQL_MODE else "Local Qwen 3.5 4B")
 
 st.markdown('<div class="dh-section-title">Ask a clinical data question</div>', unsafe_allow_html=True)
 st.caption(
@@ -407,7 +425,8 @@ if question:
                     sql_limit=sql_limit,
                     top_k=top_k,
                     answer_generator=hosted_answer_generator() if HOSTED_SQL_MODE else None,
-                    allow_rag=not HOSTED_SQL_MODE,
+                    allow_rag=True,
+                    query_embedder=hosted_query_embedder() if HOSTED_SQL_MODE else None,
                 )
             except (ValueError, FileNotFoundError, RuntimeError, sqlite3.Error, OSError) as exc:
                 st.error(f"Unable to complete this request: {exc}")
