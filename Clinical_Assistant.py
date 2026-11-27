@@ -318,7 +318,7 @@ st.markdown(
     '<p>Explore synthetic clinical records across structured data and patient notes, '
     + ('with citation-guarded hosted Qwen for SQL evidence.</p>' if HOSTED_SQL_MODE
        else 'with source-aware answers powered by local AI.</p>')
-    '<div class="dh-hero-tags"><span>SQL</span><span>RAG</span><span>Qwen 3.5 4B</span>'
+    + '<div class="dh-hero-tags"><span>SQL</span><span>RAG</span><span>Qwen 3.5 4B</span>'
     '<span>Patient-scoped retrieval</span></div>'
     '</section>',
     unsafe_allow_html=True,
@@ -431,9 +431,9 @@ if question:
 st.markdown(
     '<div class="dh-app-footer">'
     'DataHealth AI <span>·</span> Local prototype <span>·</span> '
-    ('Not authenticated <span>·</span> Not approved for public deployment'
+    + ('Not authenticated <span>·</span> Not approved for public deployment'
      if HOSTED_SQL_MODE else
      'Not authenticated <span>·</span> Keep on localhost and never use real patient data')
-    '</div>',
+    + '</div>',
     unsafe_allow_html=True,
 )
