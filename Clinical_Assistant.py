@@ -320,7 +320,9 @@ with st.sidebar:
         st.rerun()
     st.markdown(
         '<div class="dh-sidebar-footer">'
-        '<span class="dh-status-dot"></span> LOCAL DEMO<br>'
+        '<span class="dh-status-dot"></span> '
+        + ('CLOUD APPLICATION' if HOSTED_SQL_MODE else 'LOCAL DEMO')
+        + '<br>'
         'Synthetic data only. No real clinical use.'
         '</div>',
         unsafe_allow_html=True,

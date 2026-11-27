@@ -12,7 +12,6 @@ from contextlib import closing
 from hashlib import sha256
 from pathlib import Path, PurePosixPath
 import os
-import runpy
 import sqlite3
 import stat
 import tempfile
@@ -198,7 +197,13 @@ def launch() -> None:
     # Hosted preview uses SQL-only retrieval and bounded Mixlayer inference.
     # Directly launching Clinical_Assistant.py retains the local Ollama path.
     os.environ["DATAHEALTH_HOSTED_SQL"] = "1"
-    runpy.run_path(str(ROOT / "Clinical_Assistant.py"), run_name="__main__")
+    # Explicit page titles keep navigation professional without renaming files.
+    navigation = st.navigation([
+        st.Page(str(ROOT / "Clinical_Assistant.py"), title="DataHealth AI", icon="🧬", default=True),
+        st.Page(str(ROOT / "pages/1_Analytics_Dashboard.py"), title="Analytics Dashboard", icon="📊"),
+        st.Page(str(ROOT / "pages/2_ML_Forecasting.py"), title="ML Forecasting", icon="📈"),
+    ])
+    navigation.run()
 
 
 if __name__ == "__main__":
