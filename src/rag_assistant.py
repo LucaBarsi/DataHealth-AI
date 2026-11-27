@@ -14,7 +14,7 @@ import math
 from pathlib import Path
 import sqlite3
 import sys
-from typing import Any
+from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
@@ -253,7 +253,8 @@ def build_index(silver: Path, database: Path, index_dir: Path, reports: Path,
 
 
 def retrieve(database: Path, index_dir: Path, patient_id: str, question: str,
-             embed_model: str, ollama_url: str, top_k: int = 3) -> dict:
+             embed_model: str, ollama_url: str, top_k: int = 3,
+             query_embedder: Callable[[str], list[float]] | None = None) -> dict:
     if not question.strip() or not 1 <= top_k <= 5:
         raise ValueError("Question must be nonempty and top-k must be 1..5")
     patient = valid_patient(database, patient_id)
@@ -263,7 +264,16 @@ def retrieve(database: Path, index_dir: Path, patient_id: str, question: str,
         raise ValueError("Embedding model differs from the stored index. Use the same model or rebuild.")
     if collection.count() == 0:
         return {"patient": patient, "question": question, "passages": []}
-    vector = embed_texts([question], embed_model, ollama_url)[0]
+    # Hosted deployment may supply a compatible CPU query embedder. Direct
+    # local calls continue using the original Ollama endpoint unchanged.
+    vector = (
+        query_embedder(question)
+        if query_embedder is not None
+        else embed_texts([question], embed_model, ollama_url)[0]
+    )
+    if (not isinstance(vector, (list, tuple)) or len(vector) != 768
+            or any(not isinstance(x, (int, float)) or not math.isfinite(x) for x in vector)):
+        raise RuntimeError("Query embedding is not a finite 768-dimensional vector")
     results = collection.query(query_embeddings=[vector], n_results=top_k,
                                where={"patient_id": patient_id},
                                include=["documents", "metadatas", "distances"])
