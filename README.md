@@ -4,11 +4,11 @@
 
 **DataHealth AI** is an end-to-end educational platform combining **synthetic HL7 FHIR R4 healthcare data**, quality-aware data engineering, patient-scoped SQL and RAG, LLM-assisted retrieval, interactive analytics, and exploratory operational forecasting.
 
-### [Launch the live DataHealth AI application](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/)
+### [Launch the live DataHealth AI application](https://datahealth-ai.streamlit.app/)
 
-[**Streamlit Cloud demo**](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/) · [Deployment source](https://github.com/LucaBarsi/DataHealth-AI/tree/deployment/streamlit-full-112) · [Technical documentation](docs/)
+[**Streamlit Cloud demo**](https://datahealth-ai.streamlit.app/) · [Deployment source](https://github.com/LucaBarsi/DataHealth-AI/tree/deployment/streamlit-full-112) · [Technical documentation](docs/)
 
-**Project status — November 27, 2026:** a **112-patient synthetic-data application is deployed** on Streamlit Community Cloud. The local Python/SQLite/Ollama project and the separate Ubuntu/WSL 2 Spark workflow remain available for experimentation. The app is deployed from `deployment/streamlit-full-112`, while the GitHub `main` branch retains the local engineering baseline. **The source repository is private**, even when the hosted application is publicly accessible.
+**Project status — November 27, 2026:** a **112-patient synthetic-data application is deployed** on Streamlit Community Cloud. The local Python/SQLite/Ollama project and the separate Ubuntu/WSL 2 Spark workflow remain available for experimentation. The app is deployed from `deployment/streamlit-full-112`, while the GitHub `main` branch retains the local engineering baseline. **The GitHub source repository is public**, and the web application is available separately on Streamlit Community Cloud.
 
 > [!IMPORTANT]
 > **Synthetic data only.** This is a research and portfolio prototype, **not** a clinical decision-support system. Never enter real patient information or use outputs for diagnosis, treatment, monitoring, or medical decisions. Valid citation IDs and structural quality checks do **not** establish factual or clinical correctness.
@@ -184,7 +184,7 @@ These results are **not** a general accuracy estimate, a calibrated hallucinatio
 
 ## Run locally
 
-The source repository is currently **private**; cloning requires authorized access. Public visitors can use the [web demo](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/) without installing the local stack. The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
+The source repository is **public**; visitors can inspect or clone the code. The hosted application is available via the [web demo](https://datahealth-ai.streamlit.app/) without installing the local stack. The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
 
 ### Windows — application and local AI
 
@@ -345,4 +345,4 @@ Historical `README_PHASE*.md` documents are now organized under [`docs/developme
 
 ---
 
-**[Live DataHealth AI application](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/)** · [Source repository (private)](https://github.com/LucaBarsi/DataHealth-AI) · **Scope:** educational, synthetic-data-only prototype; not for clinical use.
+**[Live DataHealth AI application](https://datahealth-ai.streamlit.app/)** · [Public source repository](https://github.com/LucaBarsi/DataHealth-AI) · **Scope:** educational, synthetic-data-only prototype; not for clinical use.
