@@ -17,7 +17,7 @@ from pathlib import Path
 import re
 import sqlite3
 import sys
-from typing import Any
+from typing import Any, Callable
 
 from . import clinical_assistant, rag_assistant
 
@@ -108,7 +108,8 @@ def _marker_for_row(topic: str, row: dict[str, Any], patient_id: str) -> str:
 def retrieve_hybrid(database: Path, index_dir: Path, patient_id: str, question: str,
                     mode: str = "auto", topic: str | None = None, sql_limit: int = 5,
                     top_k: int = 3, embed_model: str = DEFAULT_EMBED_MODEL,
-                    ollama_url: str = DEFAULT_OLLAMA_URL) -> dict[str, Any]:
+                    ollama_url: str = DEFAULT_OLLAMA_URL,
+                    query_embedder: Callable[[str], list[float]] | None = None) -> dict[str, Any]:
     if not 1 <= sql_limit <= 10:
         raise ValueError("sql-limit must be between 1 and 10")
     if not 1 <= top_k <= 5:
@@ -127,7 +128,8 @@ def retrieve_hybrid(database: Path, index_dir: Path, patient_id: str, question: 
     passages: list[dict[str, Any]] = []
     if route["use_rag"]:
         found = rag_assistant.retrieve(database, index_dir, patient_id, question,
-                                       embed_model, ollama_url, top_k)
+                                       embed_model, ollama_url, top_k,
+                                       query_embedder=query_embedder)
         if found["patient"]["patient_id"] != patient_id:
             raise RuntimeError("RAG returned a different patient; refusing response")
         passages = found["passages"]
