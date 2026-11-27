@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import sqlite3
-from typing import Any, MutableMapping
+from typing import Any, Callable, MutableMapping
 
 from . import hybrid_assistant, reliable_assistant
 
@@ -58,6 +58,8 @@ def ask_synthetic_patient(
     sql_limit: int = 5,
     top_k: int = 2,
     max_retries: int = 1,
+    answer_generator: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
+    allow_rag: bool = True,
 ) -> dict[str, Any]:
     """Retrieve scoped evidence and return citation-guarded generation."""
     if not question or not question.strip():
@@ -72,15 +74,27 @@ def ask_synthetic_patient(
         raise FileNotFoundError("Gold database is missing")
     if mode in ("rag", "hybrid") and not Path(index_dir).exists():
         raise FileNotFoundError("ChromaDB index is missing")
-    # In auto mode the route might select RAG; retrieve_hybrid handles the check.
+    # The hosted SQL pilot has no compatible remote nomic-embed-text endpoint.
+    # Block routes requiring document embeddings BEFORE retrieval or generation.
+    route = hybrid_assistant.route_question(question.strip(), mode=mode, topic=topic)
+    if not allow_rag and route["use_rag"]:
+        raise ValueError(
+            "Hosted RAG is not available until an embeddings service is "
+            "configured. Select SQL retrieval and ask a structured-data question."
+        )
+    # The local default still supports SQL, RAG and hybrid Ollama retrieval.
     evidence = hybrid_assistant.retrieve_hybrid(
         Path(database), Path(index_dir), patient_id, question.strip(),
         mode=mode, topic=topic, sql_limit=sql_limit, top_k=top_k,
     )
     if evidence.get("patient", {}).get("patient_id") != patient_id:
         raise RuntimeError("Patient scope mismatch: response was blocked")
-    response = reliable_assistant.generate_reliable_answer(
-        evidence, max_retries=max_retries
+    response = (
+        answer_generator(evidence)
+        if answer_generator is not None
+        else reliable_assistant.generate_reliable_answer(
+            evidence, max_retries=max_retries
+        )
     )
     return {"evidence": evidence, "response": response}
 
