@@ -2,12 +2,28 @@
 
 **Data that connects. Insights you can trace.**
 
-**DataHealth AI** is an educational, local-first clinical-data intelligence prototype built around **synthetic HL7 FHIR R4 data**. It combines quality-aware data engineering, a relational Gold Layer, patient-scoped SQL and document retrieval, a locally run language model, analytics, and exploratory operational forecasting in a Streamlit workspace.
+**DataHealth AI** is an end-to-end educational platform combining **synthetic HL7 FHIR R4 healthcare data**, quality-aware data engineering, patient-scoped SQL and RAG, LLM-assisted retrieval, interactive analytics, and exploratory operational forecasting.
+
+### [Launch the live DataHealth AI application](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/)
+
+[**Streamlit Cloud demo**](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/) · [Deployment source](https://github.com/LucaBarsi/DataHealth-AI/tree/deployment/streamlit-full-112) · [Technical documentation](docs/)
+
+**Project status — November 27, 2026:** a **112-patient synthetic-data application is deployed** on Streamlit Community Cloud. The local Python/SQLite/Ollama project and the separate Ubuntu/WSL 2 Spark workflow remain available for experimentation. The app is deployed from `deployment/streamlit-full-112`, while the GitHub `main` branch retains the local engineering baseline. **The source repository is private**, even when the hosted application is publicly accessible.
 
 > [!IMPORTANT]
-> **Synthetic data only.** This is a research and portfolio project, **not** a clinical decision-support system. Do not use it to diagnose, treat, monitor, or make decisions about real people. Passing structural checks and finding valid citation IDs do **not** establish clinical correctness.
+> **Synthetic data only.** This is a research and portfolio prototype, **not** a clinical decision-support system. Never enter real patient information or use outputs for diagnosis, treatment, monitoring, or medical decisions. Valid citation IDs and structural quality checks do **not** establish factual or clinical correctness.
 
-**Project status (Phase 22 completed, 2026-11-26):** functional **local** prototype with a separate Ubuntu/WSL Spark workflow. Phase 22 documentation and validation were committed and pushed to the **private** GitHub `main` branch (commit [`04331db`](https://github.com/LucaBarsi/DataHealth-AI/commit/04331db24dc732c345d2e5ae5777873f88ed025f)). **No public web deployment** is claimed.
+## Explore the live application
+
+| Page | What it demonstrates |
+|---|---|
+| **DataHealth AI (Clinical Assistant)** | Select one of 112 synthetic patients; ask questions in English using auto, SQL, RAG, or hybrid retrieval; inspect source IDs, evidence, quality flags, and evidence-linked measurements |
+| **Analytics Dashboard** | Explore synthetic patient, encounter, observation, and data-quality summaries through interactive charts |
+| **ML Forecasting** | Review exploratory, aggregate monthly encounter forecasts based on synthetic data; **not** patient-level risk prediction |
+
+**Hosted architecture:** Python 3.12 on Streamlit Community Cloud, with a read-only synthetic SQLite Gold Layer, a prebuilt ChromaDB index, **FastEmbed CPU query embeddings**, and **Qwen 3.5 4B inference via Mixlayer**. Data/index/report archives come from a private Hugging Face dataset, with checksum validation at startup.
+
+The public prototype has best-effort **6 model calls/session**, **15 seconds between calls**, and **24 model calls/hour per Python process**. These are *not* hard account-wide API quotas. Missing/invalid citations or model unavailability can trigger an evidence-only response. Cloud model initialization may slow the first question.
 
 ## Why this project exists
 
@@ -19,7 +35,7 @@ The project has a local engineering pipeline and an independent Spark/Parquet ex
 
 ### Clinical Assistant
 
-Select one synthetic patient, ask a question in English, use SQL/RAG/hybrid retrieval (or automatic routing), and inspect cited evidence with quality flags. Responses use a locally running **Qwen 3.5 4B** model through **Ollama**.
+Select one synthetic patient, ask a question in English, use SQL/RAG/hybrid retrieval (or automatic routing), and inspect cited evidence with quality flags. **Local inference** uses Qwen 3.5 4B through **Ollama**; **hosted inference** uses Qwen 3.5 4B via the **Mixlayer API**.
 
 ![Clinical Assistant displaying cited synthetic vital-sign evidence](assets/screenshots/clinical-assistant.png)
 
@@ -40,15 +56,15 @@ For eligible structured answers, the Clinical Assistant re-queries **read-only S
 
 ![Historical measurements linked to structured evidence](assets/screenshots/evidence-linked-chart.png)
 
-*Existing screenshot paths are retained from the earlier README. Verify that all referenced image files are present and reflect the latest UI before publication.*
+*Screenshots show earlier local versions of the interface and may differ from the latest hosted UI.*
 
 ### Operational ML forecasting — Phase 18
 
-The project includes a **local exploratory workload-forecasting** module and Streamlit ML Forecasting page (`src/workload_forecast.py` and `pages/2_ML_Forecasting.py`). This work concerns operational aggregates; it is **not** a clinical prediction or patient-risk model. See [Phase 18 notes](docs/development_history/README_PHASE18.md) and [forecasting methodology](docs/phase18_workload_forecasting.md).
+The project includes an **exploratory workload-forecasting** module and Streamlit ML Forecasting page (`src/workload_forecast.py` and `pages/2_ML_Forecasting.py`). This work concerns operational aggregates; it is **not** a clinical prediction or patient-risk model. See [Phase 18 notes](docs/development_history/README_PHASE18.md) and [forecasting methodology](docs/phase18_workload_forecasting.md).
 
 ## Implemented capabilities and scope
 
-| Area | What is present in the local project | Important boundary |
+| Area | Implemented capability | Important boundary |
 |---|---|---|
 | **FHIR ingestion and quality** | Selected Synthea FHIR R4 resources, metadata auditing, Python transformations, structural review flags | Not complete FHIR conformance or clinical validation |
 | **Gold Layer and analytics** | Relational SQLite database, predefined patient-scoped/read-only SQL queries, Streamlit and Plotly dashboards | No multi-user access control |
@@ -59,11 +75,35 @@ The project includes a **local exploratory workload-forecasting** module and Str
 | **Pipeline consistency audit (Phase 20)** | Read-only checks comparing synthetic FHIR Bundle counts, Spark Parquet aggregates, and an optional SQLite summary | Structural/count consistency, not clinical correctness |
 | **Operational forecasting (Phase 18)** | Local ML experimentation and dashboard page | Not patient-level risk prediction |
 | **Power BI preparation** | Export module and guidance for downstream reporting | Does not mean a Power BI dashboard or service is deployed |
-| **Cloud Demo / retrieval benchmarks** | Local evaluation and optional hosted-inference-oriented code paths, including semantic retrieval experiments | Not evidence of a managed cloud deployment |
+| **Hosted web demo** | Streamlit Cloud serving 112 synthetic patients; read-only SQLite and ChromaDB; Mixlayer Qwen inference; FastEmbed CPU query embeddings | No real clinical data or production-grade authorization; query embeddings approximate the Ollama-generated index |
 
 ## System architecture
 
-The two engineering paths are deliberately shown separately: the **Python/SQLite application pipeline** and the **Spark/Parquet validation workflow**. They are not represented as a single production lakehouse.
+### Hosted Streamlit deployment
+
+The live application uses **precomputed** synthetic assets; it does not run ingestion, Spark training, or index construction in Streamlit Cloud.
+
+```mermaid
+flowchart LR
+    A["Private synthetic assets / Hugging Face"] --> B["Streamlit Community Cloud"]
+    B --> C["SQLite Gold Layer"]
+    B --> D["Prebuilt ChromaDB index"]
+    E["FastEmbed CPU"] --> D
+    C --> F["Patient-scoped SQL / RAG evidence"]
+    D --> F
+    F --> G["Qwen 3.5 4B via Mixlayer API"]
+    G --> H["Citation-ID guard or evidence-only fallback"]
+    H --> I["Clinical Assistant"]
+    C --> J["Analytics Dashboard"]
+    B --> K["Precomputed Phase 18 reports"]
+    K --> L["ML Forecasting"]
+```
+
+The ChromaDB index was originally built using Ollama `nomic-embed-text`; hosted FastEmbed `nomic-ai/nomic-embed-text-v1.5-Q` is an **experimental query embedding compatibility approach**, not identical inference or a clinical retrieval guarantee.
+
+### Local application and Spark experiment
+
+The local application combines the **Python/SQLite pipeline** with **Ollama**, while Spark/Parquet experiments are performed separately under Ubuntu/WSL 2. These are not a managed production lakehouse.
 
 ```mermaid
 flowchart TD
@@ -93,7 +133,7 @@ flowchart TD
     E --> U["Power BI-ready exports"]
 ```
 
-The source diagram is available at [`docs/architecture_overview.mmd`](docs/architecture_overview.mmd). Diagram edges are a high-level explanation; they are **not** evidence of a cloud deployment or a live streaming architecture.
+The source diagram is available at [`docs/architecture_overview.mmd`](docs/architecture_overview.mmd). This source diagram documents **local** processing. The hosted deployment is represented separately above; neither path implies real-time streaming, production Azure/AWS infrastructure, or patient authentication.
 
 **Local data layout:** `data/raw/` (source Bundles) → `data/processed/fhir/` (Python transformed data) → `data/silver/fhir/` (reviewed data) → `data/gold/datahealth.db` (SQLite). The separate Spark workflow writes Silver/Gold Parquet artifacts, documented in [Phase 19](docs/development_history/README_PHASE19_SPARK.md). The ChromaDB index is stored locally under `data/vectorstore/chroma/`. Runtime data and generated reports are excluded from Git.
 
@@ -102,8 +142,9 @@ The source diagram is available at [`docs/architecture_overview.mmd`](docs/archi
 | Component | Technologies / environment |
 |---|---|
 | Data source | Synthea, HL7 FHIR R4, JSON |
-| Windows application | Python 3.12, Pandas, NumPy, SQLite, Streamlit, Plotly, Matplotlib |
-| AI and retrieval | Ollama, Qwen 3.5 4B, `nomic-embed-text`, ChromaDB; FastEmbed in selected Cloud Demo/benchmark paths |
+| Local application | Python 3.12, Pandas, NumPy, SQLite, Streamlit, Plotly, Matplotlib |
+| Hosted application | Streamlit Community Cloud, Python 3.12, Hugging Face private synthetic assets, FastEmbed CPU, Mixlayer API |
+| AI and retrieval | Local Ollama Qwen 3.5 4B and `nomic-embed-text`; hosted Qwen 3.5 4B and FastEmbed; ChromaDB |
 | ML experimentation | Scikit-learn and project-specific forecasting modules |
 | Spark workflow | Ubuntu on WSL 2, PySpark 4.3.0, compatible Java runtime, Parquet |
 | Evaluation and versioning | `unittest`, Git, GitHub |
@@ -112,7 +153,7 @@ The source diagram is available at [`docs/architecture_overview.mmd`](docs/archi
 
 ## Experimental results — one synthetic dataset
 
-These numbers refer to **one local run**, not guaranteed values for a different Synthea sample or random seed.
+These numbers describe **one fixed synthetic dataset**, which also underpins the cloud application's 112-patient SQLite/ChromaDB assets. They are not guaranteed for other Synthea samples or seeds.
 
 | Indicator | Local result |
 |---|---:|
@@ -143,7 +184,7 @@ These results are **not** a general accuracy estimate, a calibrated hallucinatio
 
 ## Run locally
 
-The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
+The source repository is currently **private**; cloning requires authorized access. Public visitors can use the [web demo](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/) without installing the local stack. The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
 
 ### Windows — application and local AI
 
@@ -187,7 +228,15 @@ Start the local interface:
 .\.venv\Scripts\python.exe -m streamlit run Clinical_Assistant.py --server.address 127.0.0.1
 ```
 
-Use the Streamlit navigation to access **Clinical Assistant**, **Analytics Dashboard**, and **ML Forecasting**. Local model inference requires Ollama to be running. Keep the application on localhost and never load real patient data.
+Use the Streamlit navigation to access **Clinical Assistant**, **Analytics Dashboard**, and **ML Forecasting**. Local model inference requires Ollama to be running. Keep the local application on localhost and never load real patient data.
+
+### Hosted deployment — separate branch
+
+The live Streamlit entrypoint is [`streamlit_full_cloud.py`](https://github.com/LucaBarsi/DataHealth-AI/blob/deployment/streamlit-full-112/streamlit_full_cloud.py), on the [`deployment/streamlit-full-112`](https://github.com/LucaBarsi/DataHealth-AI/tree/deployment/streamlit-full-112) branch, **not** on `main`. This entrypoint downloads validated private **synthetic** assets, prepares the SQLite database, ChromaDB index, and forecasting reports, then launches the three pages.
+
+Streamlit Secrets stores `HF_TOKEN`, `QWEN_API_KEY`, `QWEN_API_BASE_URL`, and `QWEN_MODEL_ID` **outside Git**. A clone alone cannot reproduce the exact hosted application without authorized synthetic asset access and independently configured API credentials. Do not publish real keys in documentation, commits, screenshots, or issues.
+
+The public demonstration has no clinical-user authentication and must never process real patient information.
 
 ### Ubuntu / WSL 2 — separate Spark environment
 
@@ -216,6 +265,8 @@ Windows example, from the project root:
 
 **Phase 22 validation:** 268 non-Spark tests passed in the project Windows environment; 3/3 Spark ETL and 6/6 local integration helper tests passed on Ubuntu/WSL 2; and the read-only pipeline audit reported **12/12** internal consistency checks passed. A separate Windows Python 3.12.10 virtual environment passed `pip check`, 8/8 library imports, and 17/17 selected functional tests. Spark tests were deliberately run on WSL rather than native Windows because of earlier native Hadoop compatibility issues. These results do **not** establish full end-to-end clean-machine reproducibility or independent clinical validation. See the [Phase 22 validation report](PHASE22_FINAL_VALIDATION.md).
 
+**Hosted deployment preflight:** 15 hosted-focused automated tests passed, and the live application was manually checked with SQL and RAG questions and both dashboards. This verifies basic integration, not factual accuracy, concurrent-user capacity, sustained service availability, or medical safety.
+
 ## Repository layout
 
 ```text
@@ -226,7 +277,7 @@ DataHealth-AI/
 │   ├── 1_Analytics_Dashboard.py
 │   └── 2_ML_Forecasting.py
 ├── src/                      # ETL, SQL, AI/retrieval, analytics, forecasting, Spark
-├── cloud_demo/               # Evaluation/benchmarks and optional demo backends
+├── cloud_demo/               # Evaluation/benchmarks and hosted usage safeguards
 ├── tests/                    # Automated tests
 ├── scripts/                  # Project utilities
 ├── sql/                      # SQL examples
@@ -238,7 +289,7 @@ DataHealth-AI/
 └── README.md
 ```
 
-Generated `data/` and `reports/` directories are intentionally excluded from Git. These are **runtime artifacts**, not public datasets shipped with the source repository.
+Generated `data/` and `reports/` directories are intentionally excluded from Git. These are **runtime artifacts**, not public datasets shipped with the source repository. Hosted-only code such as `streamlit_full_cloud.py` and model adapters is maintained on the deployment branch.
 
 ## Technical documentation
 
@@ -254,14 +305,16 @@ Generated `data/` and `reports/` directories are intentionally excluded from Git
 | Downstream Power BI preparation | [Power BI guide](docs/development_history/README_POWER_BI.md) |
 | Security and deployment | [Deployment readiness](docs/deployment_readiness.md) |
 
-Historical `README_PHASE*.md` documents are now organized under [`docs/development_history/`](docs/development_history/). Local Markdown links were updated and checked during Phase 22; the source changes were committed and pushed to the private GitHub `main` branch.
+Historical `README_PHASE*.md` documents are now organized under [`docs/development_history/`](docs/development_history/). Local Markdown links were updated and checked during Phase 22; the hosted application is an additional implementation maintained separately from the local baseline.
 
 ## Security, limitations, and release readiness
 
 - **Synthetic data only.** Do not include real patient information, secret tokens, `.env`, local database/index files, reports, or generated datasets in the Git repository.
-- **Not patient authentication.** Selecting a patient ID and scoping retrieval in a local demo are **not** substitutes for authorization, identity verification, auditing, privacy controls, or secure internet-facing deployment.
-- **Citation and quality caveats.** Citation IDs indicate reference identity, not support for every generated claim; structural checks do not establish clinical correctness.
-- **No hosted app.** The local Ollama + SQLite + ChromaDB configuration is not an internet-ready deployment. Managed cloud infrastructure and live streaming remain future work.
+- **Not clinical authentication.** Choosing a synthetic patient and scoping retrieval are not authorization, identity verification, auditing, or privacy safeguards for real patients.
+- **Citation and quality caveats.** Citation IDs confirm reference identifiers only, not every generated claim or the chronological correctness of a retrieved note.
+- **Hosted educational prototype.** The Streamlit Cloud app does not ingest real clinical records, has no production patient login/authorization, and depends on external model availability and API quotas. This is not a hospital or healthcare production service.
+- **Private synthetic assets and secrets.** Hugging Face synthetic packages are checksum-validated at startup; credentials are configured in Streamlit Secrets. `.gitignore` excludes local keys, databases, indexes, and generated reports. Never expose private tokens.
+- **Not implemented:** real-time Kafka streaming, production-grade Azure/AWS cloud infrastructure, and regulated clinical software controls.
 - **Reproducibility partially validated.** Phase 22 completed local Markdown link checks, Windows/WSL regression testing, pipeline consistency auditing, clean-environment dependency/import checks, and selected functional tests. Complete application setup with external data and model prerequisites on a new machine remains unverified.
 - **License:** no project software license has yet been selected; review code, data, and dependency licenses before claiming unrestricted reuse rights.
 
@@ -278,7 +331,8 @@ Historical `README_PHASE*.md` documents are now organized under [`docs/developme
 - [ ] Full clean-machine application setup with all external data/model prerequisites
 - [ ] Review screenshots against the current UI and check outstanding media naming issues
 - [ ] Broader multi-patient, claim-level AI evaluation
-- [ ] Protected public demo deployment, if pursued
+- [x] Publish the 112-patient educational demo on Streamlit Community Cloud
+- [ ] Evaluate concurrent public access, model-provider spending caps, and broader claim-level answer accuracy
 - [ ] Kafka streaming and managed Azure/AWS architecture, if pursued
 - [ ] Production-grade access controls and legal/security review for any real-world use
 
@@ -286,8 +340,9 @@ Historical `README_PHASE*.md` documents are now organized under [`docs/developme
 
 - [Synthea](https://github.com/synthetichealth/synthea) — synthetic health-record generation.
 - [HL7 FHIR R4](https://hl7.org/fhir/R4/) — healthcare interoperability specification.
-- [Ollama](https://ollama.com/), [ChromaDB](https://www.trychroma.com/), [Streamlit](https://streamlit.io/), [Plotly](https://plotly.com/), and [Apache Spark](https://spark.apache.org/) — major components of the local experimentation stack.
+- [Ollama](https://ollama.com/), [ChromaDB](https://www.trychroma.com/), [Streamlit](https://streamlit.io/), [Plotly](https://plotly.com/), and [Apache Spark](https://spark.apache.org/) — major experimentation components.
+- [Hugging Face](https://huggingface.co/), [FastEmbed](https://github.com/qdrant/fastembed), and [Mixlayer](https://mixlayer.ai/) — hosted synthetic asset access, query embeddings, and model inference.
 
 ---
 
-**Project repository:** [DataHealth-AI](https://github.com/LucaBarsi/DataHealth-AI) · **Scope:** local educational prototype using synthetic records only.
+**[Live DataHealth AI application](https://datahealth-ai-frgegfxufjnappaiiysu8h.streamlit.app/)** · [Source repository (private)](https://github.com/LucaBarsi/DataHealth-AI) · **Scope:** educational, synthetic-data-only prototype; not for clinical use.
