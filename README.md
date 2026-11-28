@@ -6,7 +6,7 @@
 
 ### [Launch the live DataHealth AI application](https://datahealth-ai.streamlit.app/)
 
-[**Streamlit Cloud demo**](https://datahealth-ai.streamlit.app/) · [Deployment source](https://github.com/LucaBarsi/DataHealth-AI/tree/deployment/streamlit-full-112) · [Technical documentation](docs/)
+[**Live Application**](https://datahealth-ai.streamlit.app/) · [Deployment source](https://github.com/LucaBarsi/DataHealth-AI/tree/deployment/streamlit-full-112) · [Technical documentation](docs/)
 
 **Project status — November 27, 2026:** a **112-patient synthetic-data application is deployed** on Streamlit Community Cloud. The local Python/SQLite/Ollama project and the separate Ubuntu/WSL 2 Spark workflow remain available for experimentation. The app is deployed from `deployment/streamlit-full-112`, while the GitHub `main` branch retains the local engineering baseline. **The GitHub source repository is public**, and the web application is available separately on Streamlit Community Cloud.
 
@@ -75,7 +75,7 @@ The project includes an **exploratory workload-forecasting** module and Streamli
 | **Pipeline consistency audit (Phase 20)** | Read-only checks comparing synthetic FHIR Bundle counts, Spark Parquet aggregates, and an optional SQLite summary | Structural/count consistency, not clinical correctness |
 | **Operational forecasting (Phase 18)** | Local ML experimentation and dashboard page | Not patient-level risk prediction |
 | **Power BI preparation** | Export module and guidance for downstream reporting | Does not mean a Power BI dashboard or service is deployed |
-| **Hosted web demo** | Streamlit Cloud serving 112 synthetic patients; read-only SQLite and ChromaDB; Mixlayer Qwen inference; FastEmbed CPU query embeddings | No real clinical data or production-grade authorization; query embeddings approximate the Ollama-generated index |
+| **Hosted web application** | Streamlit Cloud serving 112 synthetic patients; read-only SQLite and ChromaDB; Mixlayer Qwen inference; FastEmbed CPU query embeddings | No real clinical data or production-grade authorization; query embeddings approximate the Ollama-generated index |
 
 ## System architecture
 
@@ -184,7 +184,7 @@ These results are **not** a general accuracy estimate, a calibrated hallucinatio
 
 ## Run locally
 
-The source repository is **public**; visitors can inspect or clone the code. The hosted application is available via the [web demo](https://datahealth-ai.streamlit.app/) without installing the local stack. The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
+The source repository is **public**; visitors can inspect or clone the code. The hosted application is available via the [live application](https://datahealth-ai.streamlit.app/) without installing the local stack. The source repository does **not** provide synthetic FHIR source files, generated databases, Chroma indexes, Ollama model weights, or reports. Recreate these locally from a compatible Synthea FHIR R4 sample. During Phase 22, a separate Windows Python 3.12.10 virtual environment passed dependency checks, eight library imports, and 17 selected functional tests. **End-to-end setup from a completely clean machine, including external models and data, has not been verified.**
 
 ### Windows — application and local AI
 
@@ -331,7 +331,7 @@ Historical `README_PHASE*.md` documents are now organized under [`docs/developme
 - [ ] Full clean-machine application setup with all external data/model prerequisites
 - [ ] Review screenshots against the current UI and check outstanding media naming issues
 - [ ] Broader multi-patient, claim-level AI evaluation
-- [x] Publish the 112-patient educational demo on Streamlit Community Cloud
+- [x] Publish the 112-patient educational application on Streamlit Community Cloud
 - [ ] Evaluate concurrent public access, model-provider spending caps, and broader claim-level answer accuracy
 - [ ] Kafka streaming and managed Azure/AWS architecture, if pursued
 - [ ] Production-grade access controls and legal/security review for any real-world use
